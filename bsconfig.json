@@ -1,5 +1,5 @@
 {
-  "name": "lplayout",
+  "name": "@ellbur/lplayout",
   "version": "0.0.1",
   "sources": {
     "dir" : "src",
