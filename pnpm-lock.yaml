@@ -1,0 +1,29 @@
+lockfileVersion: 5.4
+
+specifiers:
+  '@rescript/std': 10.0.1
+  javascript-lp-solver: ^0.4.24
+  rescript: 10.0.1
+
+dependencies:
+  '@rescript/std': 10.0.1
+  javascript-lp-solver: 0.4.24
+
+devDependencies:
+  rescript: 10.0.1
+
+packages:
+
+  /@rescript/std/10.0.1:
+    resolution: {integrity: sha512-cchIxAI/zVU2sITZgVWz/QOKSRDGEhGyzMTWfsZdgNf6QD9+S/CUVfS1lBqPaX9GaGy1FCWHAqGYwIIaVqAS4Q==}
+    dev: false
+
+  /javascript-lp-solver/0.4.24:
+    resolution: {integrity: sha512-5edoDKnMrt/u3M6GnZKDDIPxOyFOg+WrwDv8mjNiMC2DePhy2H9/FFQgf4ggywaXT1utvkxusJcjQUER72cZmA==}
+    dev: false
+
+  /rescript/10.0.1:
+    resolution: {integrity: sha512-XwO1GPDtoEU4H03xQE5bp0/qtSVR6YLaJRPxWKrfFgKc+LI36ODOCie7o9UJfgzQdoMYkkZyiTGZ4N9OQEaiUw==}
+    hasBin: true
+    requiresBuild: true
+    dev: true

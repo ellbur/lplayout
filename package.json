@@ -1,0 +1,15 @@
+{
+  "name": "lplayout",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "rescript build -with-deps",
+    "clean": "rescript clean -with-deps"
+  },
+  "dependencies": {
+    "@rescript/std": "10.0.1",
+    "javascript-lp-solver": "^0.4.24"
+  },
+  "devDependencies": {
+    "rescript": "10.0.1"
+  }
+}
