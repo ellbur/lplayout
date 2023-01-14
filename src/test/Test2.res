@@ -13,8 +13,8 @@ let nodes = [
 ]
   
 let edges = [
-  { edgeID: "ac1", source: "a", sink: "c", sinkPos: -1.0 },
-  { edgeID: "bc1", source: "b", sink: "c", sinkPos: 1.0 },
+  { edgeID: "ac1", source: "a", sink: "c", sinkPos: -0.5 },
+  { edgeID: "bc1", source: "b", sink: "c", sinkPos: 0.5 },
   { edgeID: "de1", source: "d", sink: "e", sinkPos: 0.0 },
   { edgeID: "ef1", source: "e", sink: "f", sinkPos: 0.0 },
   { edgeID: "ga", source: "g", sink: "a", sinkPos: 0.0 },
