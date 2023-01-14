@@ -1,5 +1,5 @@
 
-open Graph
+open LPLayout.Graph
 
 let nodes = [
   { id: "a" },

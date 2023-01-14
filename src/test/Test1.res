@@ -164,7 +164,7 @@ siftedLevelGroupings->Js.Array2.forEachi((ar, level) =>
   Js.Console.log(`${level->Belt.Int.toString}: ${ar->Belt.Array.joinWith(", ", x=>x)}`))
 Js.Console.log("")
 
-open LP
+open LPLayout_LP
 
 let indexVar = varName => `${varName}_i`
 let indexPlusVar = varName => `${varName}_iP`

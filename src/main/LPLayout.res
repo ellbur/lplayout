@@ -1,6 +1,8 @@
 
+module Graph = LPLayout_Graph
+
 open Graph
-open GraphUtils
+open LPLayout_GraphUtils
 
 type layout = {
   nodeXs: Js.Dict.t<float>,
@@ -76,7 +78,7 @@ let doLayout: graph => layout = ({nodes, edges}) => {
 
   let siftedLevelGroupings = levelGroupings->Js.Array2.map(ar => ar->Js.Array2.map(({NodeWithXIndex.nodeID: n}) => n))
     
-  open LP
+  open LPLayout_LP
 
   let indexVar = varName => `${varName}_i`
   let indexPlusVar = varName => `${varName}_iP`

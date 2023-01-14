@@ -1,6 +1,6 @@
 
-open Graph
-open Comps
+open LPLayout_Graph
+open LPLayout_Comps
 
 type sourceMap = Belt.Map.t<string, array<edge>, StringComp.identity>
 type sinkMap = Belt.Map.t<string, array<edge>, StringComp.identity>

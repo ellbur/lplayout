@@ -1,4 +1,6 @@
 
+module JsMap = LPLayout_JsMap
+
 type model<'c, 'v> = {
   optimize: string,
   opType: [#"max" | #"min"],
