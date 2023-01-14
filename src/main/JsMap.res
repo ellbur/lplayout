@@ -17,3 +17,7 @@ let get: (t, string) => 'a = (m, k) => {
   m->toDict->Js.Dict.unsafeGet(k)
 }
 
+let getWithDefault: (t, string, 'a) => 'a = (m, k, d) => {
+  m->toDict->Js.Dict.get(k)->Belt.Option.getWithDefault(d)
+}
+

@@ -23,3 +23,7 @@ let edges = [
   { edgeID: "hd", source: "h", sink: "d", sinkPos: 0.0 },
 ]
 
+let layout = LPLayout.doLayout({nodes, edges})
+
+Js.Console.log(layout)
+

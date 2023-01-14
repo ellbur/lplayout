@@ -1,13 +1,10 @@
 
 open Graph
-open Comps
 open GraphUtils
 
-let todo: () => 'a = Js.Exn.raiseError("Not implemented")
-
 type layout = {
-  nodeXs: Belt.Map.t<string, float, StringComp.identity>,
-  nodeYs: Belt.Map.t<string, int, StringComp.identity>
+  nodeXs: Js.Dict.t<float>,
+  nodeYs: Js.Dict.t<int>
 }
 
 let doLayout: graph => layout = ({nodes, edges}) => {
@@ -23,7 +20,7 @@ let doLayout: graph => layout = ({nodes, edges}) => {
   )
 
   let rootCounter = ref(0.0)
-  let yIndexMap = doDFSCalc(
+  let xIndexMap = doDFSCalc(
     nodes,
     sourceMap,
     ~root = _ => {
@@ -47,19 +44,19 @@ let doLayout: graph => layout = ({nodes, edges}) => {
   let maxLevel = levelMap->Belt.Map.valuesToArray->Js.Array2.reduce(Js.Math.max_int, 0)
   let numLevels = maxLevel + 1
 
-  module NodeWithYIndex = {
+  module NodeWithXIndex = {
     type t = {
       nodeID: string,
-      yIndex: float
+      xIndex: float
     }
   }
 
-  let levelGroupings: array<array<NodeWithYIndex.t>> = Belt.Array.makeBy(numLevels, _ => [ ])
+  let levelGroupings: array<array<NodeWithXIndex.t>> = Belt.Array.makeBy(numLevels, _ => [ ])
   levelMap->Belt.Map.forEach((nodeID, level) => {
     let levelArray = levelGroupings[level]
     levelArray->Js.Array2.push({
-      NodeWithYIndex.nodeID: nodeID,
-      NodeWithYIndex.yIndex: yIndexMap->Belt.Map.getExn(nodeID)
+      NodeWithXIndex.nodeID: nodeID,
+      NodeWithXIndex.xIndex: xIndexMap->Belt.Map.getExn(nodeID)
     })->ignore
   })
 
@@ -75,9 +72,9 @@ let doLayout: graph => layout = ({nodes, edges}) => {
     }
 
   levelGroupings->Js.Array2.forEach(ar => ar->Belt.SortArray.stableSortInPlaceBy(
-    ({NodeWithYIndex.yIndex: y1}, {NodeWithYIndex.yIndex: y2}) => compFloat(y1, y2)))
+    ({NodeWithXIndex.xIndex: y1}, {NodeWithXIndex.xIndex: y2}) => compFloat(y1, y2)))
 
-  let siftedLevelGroupings = levelGroupings->Js.Array2.map(ar => ar->Js.Array2.map(({NodeWithYIndex.nodeID: n}) => n))
+  let siftedLevelGroupings = levelGroupings->Js.Array2.map(ar => ar->Js.Array2.map(({NodeWithXIndex.nodeID: n}) => n))
     
   open LP
 
@@ -162,6 +159,15 @@ let doLayout: graph => layout = ({nodes, edges}) => {
 
   let sol = solve(model)
   
-  todo()
+  let nodeXs = Js.Dict.empty()
+  let nodeYs = Js.Dict.empty()
+  
+  levelMap->Belt.Map.forEach((nodeID, level) =>
+    nodeYs->Js.Dict.set(nodeID, level))
+  
+  nodes->Js.Array2.forEach(({id: nodeId}) =>
+    nodeXs->Js.Dict.set(nodeId, sol->JsMap.getWithDefault(nodeId, 0.0)))
+    
+  { nodeXs, nodeYs }
 }
 
