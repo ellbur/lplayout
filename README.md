@@ -41,6 +41,13 @@ let layout = LPLayout.doLayout({nodes, edges})
 Js.Console.log(layout)
 ```
 
+```javascript
+{
+  nodeXs: { a: 0, b: 1, c: 0, d: 2, e: 2, f: 2, g: 1, h: 1 },
+  nodeYs: { a: 1, b: 1, c: 0, d: 2, e: 1, f: 0, g: 2, h: 3 }
+}
+```
+
 # In JavaScript
 
 Although written in ReScript, the code is usable from JavaScript. The above example can be written:
