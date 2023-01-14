@@ -3,7 +3,7 @@ Simple hierarchical directed acyclic graph (DAG) layout in [ReScript](https://re
 
 The algorithm is based on a linear programming model that has the advantages of being fast and deterministic at the cost of looking slightly less natural than models based on second-order cost functions such as force-directed layouts.
 
-Each edge has an attribute `sinkPos` that represents the order of source edges for that particular sink node. For example, if nodes `a` and `b` feed into node `c`, you can assign the corresponding `ac` and `bc` edges a `sinkPos` of `-0.5` and `+0.5` respectively, to indicate that `ac` is to the left of `bc`. If a node has only one source, the corresponding edge should have a `sinkPos` of `0.0` representing centered. For three sources, `-1.0`, `0.0`, `+1.0`, etc.
+Each edge has an attribute `sinkPos` that represents the left-to-right ordering of source edges for that sink node. For example, if nodes `a` and `b` feed into node `c`, you can assign the corresponding `ac` and `bc` edges a `sinkPos` of `-1.0` and `+1.0` respectively, to indicate that `ac` is to the left of `bc`. If a node has only one source, the corresponding edge should have a `sinkPos` of `0.0` representing centered. For three sources, `-1.0`, `0.0`, `+1.0`. For four sources, `-1.0`, `-0.33`, `+0.33`, `+1.0`, and so on.
 
 # Example
 
@@ -26,8 +26,8 @@ let nodes = [
 ]
   
 let edges = [
-  { edgeID: "ac1", source: "a", sink: "c", sinkPos: -0.5 },
-  { edgeID: "bc1", source: "b", sink: "c", sinkPos: 0.5 },
+  { edgeID: "ac1", source: "a", sink: "c", sinkPos: -1.0 },
+  { edgeID: "bc1", source: "b", sink: "c", sinkPos: 1.0 },
   { edgeID: "de1", source: "d", sink: "e", sinkPos: 0.0 },
   { edgeID: "ef1", source: "e", sink: "f", sinkPos: 0.0 },
   { edgeID: "ga", source: "g", sink: "a", sinkPos: 0.0 },
@@ -60,8 +60,8 @@ const nodes = [
 ];
   
 const edges = [
-  { edgeID: "ac1", source: "a", sink: "c", sinkPos: -0.5 },
-  { edgeID: "bc1", source: "b", sink: "c", sinkPos: 0.5 },
+  { edgeID: "ac1", source: "a", sink: "c", sinkPos: -1.0 },
+  { edgeID: "bc1", source: "b", sink: "c", sinkPos: 1.0 },
   { edgeID: "de1", source: "d", sink: "e", sinkPos: 0.0 },
   { edgeID: "ef1", source: "e", sink: "f", sinkPos: 0.0 },
   { edgeID: "ga", source: "g", sink: "a", sinkPos: 0.0 },
