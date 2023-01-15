@@ -110,7 +110,6 @@ let doLayout: graph => layout = ({nodes, edges}) => {
 
   // Do background
   nodes->Js.Array2.forEach(node => {
-    constraints->JsMap.set(node.id, {"min": 0.0})
     variables->JsMap.set(node.id, {"badness": backgroudBadness})
   })
 
@@ -131,7 +130,6 @@ let doLayout: graph => layout = ({nodes, edges}) => {
         let separation = 0.5 *. (width1 +. width2) +. horizontalSpacing
         
         variables->set(overlapVar(node1, node2), {"badness": overlapBadness})
-        constraints->set(overlapVar(node1, node2), {"min": 0.0})
         constraints->set(indexVar(overlapVar(node1, node2)), {"min": separation})
         variables->get(node1)->set(indexVar(overlapVar(node1, node2)), -1.0)
         variables->get(node2)->set(indexVar(overlapVar(node1, node2)), 1.0)
@@ -159,7 +157,6 @@ let doLayout: graph => layout = ({nodes, edges}) => {
       // swing - parent + child > pos
       
       variables->set(swingVar(~parent, ~child), {"badness": swingingBadness})
-      constraints->set(swingVar(~parent, ~child), {"min": 0.0})
       
       constraints->set(indexPlusVar(swingVar(~parent, ~child)), {"min": -. edge.sinkPos})
       variables->get(parent)->set(indexPlusVar(swingVar(~parent, ~child)), +1.0)
@@ -179,7 +176,7 @@ let doLayout: graph => layout = ({nodes, edges}) => {
     constraints: constraints,
     variables: variables
   }
-
+  
   let sol = solve(model)
   
   let nodeCenterXs = Js.Dict.empty()
@@ -225,6 +222,17 @@ let doLayout: graph => layout = ({nodes, edges}) => {
     )
   )
     
+  let overhangs = nodes->Js.Array2.map(({id, width}) => {
+    let cx = nodeCenterXs->Js.Dict.unsafeGet(id)
+    let overhang = (width/.2.0) +. (horizontalSpacing*.averageWidth/.2.0) -. cx
+    overhang
+  })
+  let worstOverhang = overhangs->Belt.Array.reduce(0.0, Js.Math.max_float)
+  
+  nodes->Js.Array2.forEach(({id: nodeId}) =>
+    nodeCenterXs->Js.Dict.set(nodeId, (nodeCenterXs->Js.Dict.unsafeGet(nodeId)) +. worstOverhang)
+  )
+  
   { nodeCenterXs, nodeCenterYs }
 }
 
