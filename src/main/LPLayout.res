@@ -3,13 +3,24 @@ module Graph = LPLayout_Graph
 
 open Graph
 open LPLayout_GraphUtils
+open LPLayout_Comps
 
 type layout = {
-  nodeXs: Js.Dict.t<float>,
-  nodeYs: Js.Dict.t<int>
+  nodeCenterXs: Js.Dict.t<float>,
+  nodeCenterYs: Js.Dict.t<float>
 }
 
+let sum = x => x->Belt.Array.reduce(0.0, (a, b) => a +. b)
+
+let average = x => sum(x)/.(Belt.Array.length(x)->Belt.Int.toFloat)
+
 let doLayout: graph => layout = ({nodes, edges}) => {
+  let averageWidth = average(nodes->Js.Array2.map(({width}) => width))
+  let averageHeight = average(nodes->Js.Array2.map(({height}) => height))
+  
+  let idMap = nodes->Js.Array2.map(node => {let {id} = node; (id, node)})
+    ->Belt.Map.fromArray(~id=module(StringComp))
+  
   let sourceMap = buildSourceMap(edges)
   
   let levelMap = doDFSCalc(
@@ -90,6 +101,9 @@ let doLayout: graph => layout = ({nodes, edges}) => {
   let backgroudBadness = 0.1
   let swingingBadness = 1.0
   let overlapBadness = 10.0
+  
+  let horizontalSpacing = 0.2
+  let verticalSpacing = 0.2
 
   let constraints = JsMap.make()
   let variables = JsMap.make()
@@ -101,17 +115,24 @@ let doLayout: graph => layout = ({nodes, edges}) => {
   })
 
   // Do overlaps
-  siftedLevelGroupings->Js.Array2.forEach(nodes => {
+  siftedLevelGroupings->Js.Array2.forEach(nodeIDs => {
     let rec iter = i => {
-      if i < Js.Array2.length(nodes)-1 {
+      if i < Js.Array2.length(nodeIDs)-1 {
         open JsMap
         
-        let node1 = nodes[i]
-        let node2 = nodes[i+1]
+        let node1 = nodeIDs[i]
+        let node2 = nodeIDs[i+1]
+        
+        let {width: widthN1} = idMap->Belt.Map.getExn(node1)
+        let {width: widthN2} = idMap->Belt.Map.getExn(node2)
+        let width1 = widthN1 /. averageWidth
+        let width2 = widthN2 /. averageWidth
+        
+        let separation = 0.5 *. (width1 +. width2) +. horizontalSpacing
         
         variables->set(overlapVar(node1, node2), {"badness": overlapBadness})
         constraints->set(overlapVar(node1, node2), {"min": 0.0})
-        constraints->set(indexVar(overlapVar(node1, node2)), {"min": 1.0})
+        constraints->set(indexVar(overlapVar(node1, node2)), {"min": separation})
         variables->get(node1)->set(indexVar(overlapVar(node1, node2)), -1.0)
         variables->get(node2)->set(indexVar(overlapVar(node1, node2)), 1.0)
         variables->get(overlapVar(node1, node2))->set(indexVar(overlapVar(node1, node2)), 1.0)
@@ -161,15 +182,49 @@ let doLayout: graph => layout = ({nodes, edges}) => {
 
   let sol = solve(model)
   
-  let nodeXs = Js.Dict.empty()
-  let nodeYs = Js.Dict.empty()
+  let nodeCenterXs = Js.Dict.empty()
+  let nodeCenterYs = Js.Dict.empty()
+  
+  let levelHeights = siftedLevelGroupings->Js.Array2.map(group =>
+    group->Js.Array2.map(id => idMap->Belt.Map.getExn(id))
+      ->Js.Array2.map(({height}) => height)
+      ->Belt.Array.reduce(0.0, Js.Math.max_float)
+  )
+
+  let accumHeights = Belt.Array.make((levelHeights->Belt.Array.length) + 1, 0.0)
+  
+  {
+    let scaledVerticalSpacing = verticalSpacing *. averageHeight
+    let accum = ref(0.0)
+    levelHeights->Js.Array2.forEachi((h, i) => {
+      accumHeights[i] = accum.contents
+      accum.contents = accum.contents +. h +. scaledVerticalSpacing
+    })
+    accumHeights[levelHeights->Belt.Array.length] = accum.contents
+  }
+  
+  let midHeights = Belt.Array.make(levelHeights->Belt.Array.length, 0.0)
+
+  {
+    let len = levelHeights->Belt.Array.length
+    let rec step = i => {
+      if i < len {
+        midHeights[i] = 0.5*.(accumHeights[i] +. accumHeights[i + 1])
+        step(i + 1)
+      }
+    }
+    step(0)
+  }
   
   levelMap->Belt.Map.forEach((nodeID, level) =>
-    nodeYs->Js.Dict.set(nodeID, level))
+    nodeCenterYs->Js.Dict.set(nodeID, midHeights[level]))
   
   nodes->Js.Array2.forEach(({id: nodeId}) =>
-    nodeXs->Js.Dict.set(nodeId, sol->JsMap.getWithDefault(nodeId, 0.0)))
+    nodeCenterXs->Js.Dict.set(nodeId, 
+      ( sol->JsMap.getWithDefault(nodeId, 0.0) ) *. averageWidth
+    )
+  )
     
-  { nodeXs, nodeYs }
+  { nodeCenterXs, nodeCenterYs }
 }
 

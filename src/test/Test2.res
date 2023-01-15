@@ -2,14 +2,14 @@
 open LPLayout.Graph
 
 let nodes = [
-  { id: "a" },
-  { id: "b" },
-  { id: "c" },
-  { id: "d" },
-  { id: "e" },
-  { id: "f" },
-  { id: "g" },
-  { id: "h" },
+  { id: "a", width: 1.0, height: 1.0 },
+  { id: "b", width: 1.0, height: 1.0 },
+  { id: "c", width: 1.0, height: 1.0 },
+  { id: "d", width: 1.0, height: 1.0 },
+  { id: "e", width: 1.0, height: 1.0 },
+  { id: "f", width: 1.0, height: 1.0 },
+  { id: "g", width: 1.0, height: 1.0 },
+  { id: "h", width: 1.0, height: 1.0 },
 ]
   
 let edges = [

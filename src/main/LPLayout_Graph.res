@@ -1,6 +1,8 @@
 
 type node = {
-  id: string
+  id: string,
+  width: float,
+  height: float
 }
 
 type edge = {

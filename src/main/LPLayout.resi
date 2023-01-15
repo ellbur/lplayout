@@ -1,7 +1,9 @@
 
 module Graph: {
   type node = {
-    id: string
+    id: string,
+    width: float,
+    height: float
   }
 
   type edge = {
@@ -18,8 +20,8 @@ module Graph: {
 }
 
 type layout = {
-  nodeXs: Js.Dict.t<float>,
-  nodeYs: Js.Dict.t<int>
+  nodeCenterXs: Js.Dict.t<float>,
+  nodeCenterYs: Js.Dict.t<float>
 }
 
 let doLayout: Graph.graph => layout

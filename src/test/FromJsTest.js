@@ -2,14 +2,14 @@
 const lpLayout = require('../../lib/js/src/main/LPLayout.bs')
 
 const nodes = [
-  { id: "a" },
-  { id: "b" },
-  { id: "c" },
-  { id: "d" },
-  { id: "e" },
-  { id: "f" },
-  { id: "g" },
-  { id: "h" },
+  { id: "a", width: 1.0, height: 1. },
+  { id: "b", width: 1.0, height: 1. },
+  { id: "c", width: 1.0, height: 1. },
+  { id: "d", width: 1.0, height: 1. },
+  { id: "e", width: 1.0, height: 1. },
+  { id: "f", width: 1.0, height: 1. },
+  { id: "g", width: 1.0, height: 1. },
+  { id: "h", width: 1.0, height: 1. },
 ]
   
 const edges = [
