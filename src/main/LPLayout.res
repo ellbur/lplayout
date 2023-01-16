@@ -98,7 +98,7 @@ let doLayout: graph => layout = ({nodes, edges}) => {
   let overlapVar = (node1, node2) => `o_${node1}_${node2}`
   let swingVar = (~parent, ~child) => `s_${parent}_${child}`
 
-  let backgroudBadness = 0.1
+  let backgroudBadness = 0.01
   let swingingBadness = 1.0
   let overlapBadness = 10.0
   
