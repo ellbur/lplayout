@@ -1,46 +1,29 @@
 
 open LPLayout_Graph
-open LPLayout_Comps
 
-type sourceMap = Belt.Map.t<string, array<edge>, StringComp.identity>
-type sinkMap = Belt.Map.t<string, array<edge>, StringComp.identity>
+type sourceMap = Js.Dict.t<array<edge>>
 
 let buildSourceMap: array<edge> => sourceMap = edges => {
-  let sourceMap: Belt.MutableMap.t<string, array<edge>, _>
-    = Belt.MutableMap.make(~id=module(StringComp))
+  let sourceMap = Js.Dict.empty()
     
   edges->Js.Array2.forEach(edge => {
-    switch sourceMap->Belt.MutableMap.get(edge.source) {
-      | None => sourceMap->Belt.MutableMap.set(edge.source, [edge])
+    switch sourceMap->Js.Dict.get(edge.source) {
+      | None => sourceMap->Js.Dict.set(edge.source, [edge])
       | Some(edgeSet) => edgeSet->Js.Array2.push(edge)->ignore
     }
   })
   
-  sourceMap->Belt.MutableMap.toArray->Belt.Map.fromArray(~id=module(StringComp))
-}
-
-let buildSinkMap: array<edge> => sinkMap = edges => {
-  let sinkMap: Belt.MutableMap.t<string, array<edge>, _>
-    = Belt.MutableMap.make(~id=module(StringComp))
-
-  edges->Js.Array2.forEach(edge => {
-    switch sinkMap->Belt.MutableMap.get(edge.sink) {
-      | None => sinkMap->Belt.MutableMap.set(edge.sink, [edge])
-      | Some(edgeSet) => edgeSet->Js.Array2.push(edge)->ignore
-    }
-  })
-  
-  sinkMap->Belt.MutableMap.toArray->Belt.Map.fromArray(~id=module(StringComp))
+  sourceMap
 }
 
 let doDFSCalc = (nodes: array<node>, sourceMap: sourceMap, ~root, ~nonRoot) => {
-  let map: Belt.MutableMap.t<string, _, _> = Belt.MutableMap.make(~id=module(StringComp))
+  let map = Js.Dict.empty()
   
   let rec calc = nodeID => {
-    switch map->Belt.MutableMap.get(nodeID) {
+    switch map->Js.Dict.get(nodeID) {
       | Some(x) => x
       | None =>
-        let sourceEdges = sourceMap->Belt.Map.getWithDefault(nodeID, [])
+        let sourceEdges = sourceMap->Js.Dict.get(nodeID)->Belt.Option.getWithDefault([])
         let x = 
           if Js.Array2.length(sourceEdges) == 0 {
             root(nodeID)
@@ -49,14 +32,13 @@ let doDFSCalc = (nodes: array<node>, sourceMap: sourceMap, ~root, ~nonRoot) => {
             nonRoot(nodeID, sourceEdges->Js.Array2.map(edge => (edge, calc(edge.sink))))
           }
           
-        map->Belt.MutableMap.set(nodeID, x)
+        map->Js.Dict.set(nodeID, x)
         x
     }
   }
   
   nodes->Js.Array2.map(node => node.id)->Js.Array2.forEach(i=>i->calc->ignore)
   
-  map->Belt.MutableMap.toArray->Belt.Map.fromArray(~id=module(StringComp))
+  map
 }
     
-

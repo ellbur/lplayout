@@ -7,7 +7,8 @@ open LPLayout_Comps
 
 type layout = {
   nodeCenterXs: Js.Dict.t<float>,
-  nodeCenterYs: Js.Dict.t<float>
+  nodeCenterYs: Js.Dict.t<float>,
+  edgeExtraNodes: Js.Dict.t<array<string>>
 }
 
 let sum = x => x->Belt.Array.reduce(0.0, (a, b) => a +. b)
@@ -17,9 +18,6 @@ let average = x => sum(x)/.(Belt.Array.length(x)->Belt.Int.toFloat)
 let doLayout: graph => layout = ({nodes, edges}) => {
   let averageWidth = average(nodes->Js.Array2.map(({width}) => width))
   let averageHeight = average(nodes->Js.Array2.map(({height}) => height))
-  
-  let idMap = nodes->Js.Array2.map(node => {let {id} = node; (id, node)})
-    ->Belt.Map.fromArray(~id=module(StringComp))
   
   let sourceMap = buildSourceMap(edges)
   
@@ -32,17 +30,73 @@ let doLayout: graph => layout = ({nodes, edges}) => {
         ->Js.Array2.reduce(Js.Math.max_int, 0) + 1
   )
 
+  let augmentedNodes = Belt.Array.copy(nodes)
+  
+  let edgeExtraNodes = Js.Dict.empty()
+  
+  let augmentedEdges = edges->Belt.Array.flatMap(edge => {
+    let {edgeID, source, sink, sinkPos} = edge
+    let sourceLevel = levelMap->Js.Dict.get(source)->Belt.Option.getExn
+    let sinkLevel = levelMap->Js.Dict.get(sink)->Belt.Option.getExn
+    
+    if sourceLevel > sinkLevel + 1 {
+      let syntheticNodes = Belt.Array.makeBy(sourceLevel - sinkLevel - 1, i => {
+        {
+          id: edgeID ++ `_synth_node_${i->Belt.Int.toString}`,
+          width: 0.0,
+          height: 0.0
+        }
+      })
+      
+      syntheticNodes->Belt.Array.forEachWithIndex((i, node) => {
+        augmentedNodes->Belt.Array.push(node)
+        levelMap->Js.Dict.set(node.id, i + sinkLevel + 1)
+      })
+      
+      edgeExtraNodes->Js.Dict.set(edgeID, syntheticNodes->Belt.Array.map(({id})=>id))
+      
+      let involvedNodeIDs = {
+        Belt.Array.concatMany([
+          [ sink ],
+          syntheticNodes->Belt.Array.map(({id}) => id),
+          [ source ]
+        ])
+      }
+      
+      Belt.Array.makeBy(sourceLevel - sinkLevel, i => {
+        {
+          edgeID: `${edgeID}_pos_${i->Belt.Int.toString}`,
+          source: involvedNodeIDs[i+1],
+          sink: involvedNodeIDs[i],
+          sinkPos: {
+            if i == 0 {
+              sinkPos
+            }
+            else {
+              0.0
+            }
+          }
+        }
+      })
+    }
+    else {
+      [edge]
+    }
+  })
+  
+  let augmentedSourceMap = buildSourceMap(augmentedEdges)
+  
   let rootCounter = ref(0.0)
   let xIndexMap = doDFSCalc(
-    nodes,
-    sourceMap,
+    augmentedNodes,
+    augmentedSourceMap,
     ~root = _ => {
       let x = rootCounter.contents
       rootCounter.contents = rootCounter.contents +. 1.0
       x
     },
     ~nonRoot = (nodeID, sourceYIndices) => {
-      let level = levelMap->Belt.Map.getExn(nodeID)
+      let level = levelMap->Js.Dict.unsafeGet(nodeID)
       let scale = Js.Math.pow_float(~base=0.5, ~exp=level->Belt.Int.toFloat)
       let influences = sourceYIndices->Js.Array2.map((({sinkPos}, influence)) =>
         influence +. (scale*.sinkPos))
@@ -54,7 +108,7 @@ let doLayout: graph => layout = ({nodes, edges}) => {
     }
   )
 
-  let maxLevel = levelMap->Belt.Map.valuesToArray->Js.Array2.reduce(Js.Math.max_int, 0)
+  let maxLevel = levelMap->Js.Dict.values->Js.Array2.reduce(Js.Math.max_int, 0)
   let numLevels = maxLevel + 1
 
   module NodeWithXIndex = {
@@ -65,11 +119,11 @@ let doLayout: graph => layout = ({nodes, edges}) => {
   }
 
   let levelGroupings: array<array<NodeWithXIndex.t>> = Belt.Array.makeBy(numLevels, _ => [ ])
-  levelMap->Belt.Map.forEach((nodeID, level) => {
+  levelMap->Js.Dict.entries->Belt.Array.forEach(((nodeID, level)) => {
     let levelArray = levelGroupings[level]
     levelArray->Js.Array2.push({
       NodeWithXIndex.nodeID: nodeID,
-      NodeWithXIndex.xIndex: xIndexMap->Belt.Map.getExn(nodeID)
+      NodeWithXIndex.xIndex: xIndexMap->Js.Dict.unsafeGet(nodeID)
     })->ignore
   })
 
@@ -88,6 +142,9 @@ let doLayout: graph => layout = ({nodes, edges}) => {
     ({NodeWithXIndex.xIndex: y1}, {NodeWithXIndex.xIndex: y2}) => compFloat(y1, y2)))
 
   let siftedLevelGroupings = levelGroupings->Js.Array2.map(ar => ar->Js.Array2.map(({NodeWithXIndex.nodeID: n}) => n))
+  
+  let idMap = augmentedNodes->Js.Array2.map(node => {let {id} = node; (id, node)})
+    ->Belt.Map.fromArray(~id=module(StringComp))
     
   open LPLayout_LP
 
@@ -109,7 +166,7 @@ let doLayout: graph => layout = ({nodes, edges}) => {
   let variables = JsMap.make()
 
   // Do background
-  nodes->Js.Array2.forEach(node => {
+  augmentedNodes->Js.Array2.forEach(node => {
     variables->JsMap.set(node.id, {"badness": backgroudBadness})
   })
 
@@ -142,9 +199,9 @@ let doLayout: graph => layout = ({nodes, edges}) => {
   })
 
   // Do swinging
-  nodes->Js.Array2.forEach(node => {
+  augmentedNodes->Js.Array2.forEach(node => {
     let child = node.id
-    sourceMap->Belt.Map.getWithDefault(child, [])->Js.Array2.forEach(edge => {
+    augmentedSourceMap->Js.Dict.get(child)->Belt.Option.getWithDefault([])->Js.Array2.forEach(edge => {
       open JsMap
         
       let parent = edge.sink
@@ -213,26 +270,30 @@ let doLayout: graph => layout = ({nodes, edges}) => {
     step(0)
   }
   
-  levelMap->Belt.Map.forEach((nodeID, level) =>
+  levelMap->Js.Dict.entries->Belt.Array.forEach(((nodeID, level)) =>
     nodeCenterYs->Js.Dict.set(nodeID, midHeights[level]))
   
-  nodes->Js.Array2.forEach(({id: nodeId}) =>
+  augmentedNodes->Js.Array2.forEach(({id: nodeId}) =>
     nodeCenterXs->Js.Dict.set(nodeId, 
       ( sol->JsMap.getWithDefault(nodeId, 0.0) ) *. averageWidth
     )
   )
     
-  let overhangs = nodes->Js.Array2.map(({id, width}) => {
+  let overhangs = augmentedNodes->Js.Array2.map(({id, width}) => {
     let cx = nodeCenterXs->Js.Dict.unsafeGet(id)
     let overhang = (width/.2.0) +. (horizontalSpacing*.averageWidth/.2.0) -. cx
     overhang
   })
   let worstOverhang = overhangs->Belt.Array.reduce(0.0, Js.Math.max_float)
   
-  nodes->Js.Array2.forEach(({id: nodeId}) =>
+  augmentedNodes->Js.Array2.forEach(({id: nodeId}) =>
     nodeCenterXs->Js.Dict.set(nodeId, (nodeCenterXs->Js.Dict.unsafeGet(nodeId)) +. worstOverhang)
   )
   
-  { nodeCenterXs, nodeCenterYs }
+  {
+    nodeCenterXs,
+    nodeCenterYs,
+    edgeExtraNodes
+  }
 }
 
