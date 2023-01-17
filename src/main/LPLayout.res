@@ -11,13 +11,18 @@ type layout = {
   edgeExtraNodes: Js.Dict.t<array<string>>
 }
 
+type layoutOptions = {
+  xSpacing: float,
+  ySpacing: float
+}
+
 let sum = x => x->Belt.Array.reduce(0.0, (a, b) => a +. b)
 
 let average = x => sum(x)/.(Belt.Array.length(x)->Belt.Int.toFloat)
 
-let doLayout: graph => layout = ({nodes, edges}) => {
-  let averageWidth = average(nodes->Js.Array2.map(({width}) => width))
-  let averageHeight = average(nodes->Js.Array2.map(({height}) => height))
+let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions) => {
+  let averageWidth = average(nodes->Js.Array2.map(({width}) => width +. layoutOptions.xSpacing))
+  let averageHeight = average(nodes->Js.Array2.map(({height}) => height +. layoutOptions.ySpacing))
   
   let sourceMap = buildSourceMap(edges)
   
@@ -159,8 +164,8 @@ let doLayout: graph => layout = ({nodes, edges}) => {
   let swingingBadness = 1.0
   let overlapBadness = 10.0
   
-  let horizontalSpacing = 0.2
-  let verticalSpacing = 0.2
+  let horizontalSpacing = layoutOptions.xSpacing /. averageWidth
+  let verticalSpacing = layoutOptions.ySpacing /. averageHeight
 
   let constraints = JsMap.make()
   let variables = JsMap.make()
