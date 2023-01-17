@@ -53,7 +53,7 @@ let doLayout: graph => layout = ({nodes, edges}) => {
         levelMap->Js.Dict.set(node.id, i + sinkLevel + 1)
       })
       
-      edgeExtraNodes->Js.Dict.set(edgeID, syntheticNodes->Belt.Array.map(({id})=>id))
+      edgeExtraNodes->Js.Dict.set(edgeID, syntheticNodes->Belt.Array.reverse->Belt.Array.map(({id})=>id))
       
       let involvedNodeIDs = {
         Belt.Array.concatMany([
