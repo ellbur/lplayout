@@ -23,7 +23,7 @@ let edges = [
   { edgeID: "hd", source: "h", sink: "d", sinkPos: 0.0 },
 ]
 
-let layout = LPLayout.doLayout({nodes, edges})
+let layout = LPLayout.doLayout({nodes, edges}, { xSpacing: 0.2, ySpacing: 0.2 })
 
 Js.Console.log(layout)
 

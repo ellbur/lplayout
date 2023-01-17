@@ -14,9 +14,7 @@ let edges = [
   { edgeID: "ed", source: "e", sink: "d", sinkPos:  0.0 },
 ]
 
-let layout = LPLayout.doLayout({nodes, edges})
+let layout = LPLayout.doLayout({nodes, edges}, { xSpacing: 0.2, ySpacing: 0.2 })
 
-// The problem is that b, d, and e are all positioned at 0.6,
-// so the eb edge crosses d.
 Js.Console.log(layout)
 

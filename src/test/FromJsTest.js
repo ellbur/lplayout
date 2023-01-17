@@ -23,7 +23,7 @@ const edges = [
   { edgeID: "hd", source: "h", sink: "d", sinkPos: 0.0 },
 ]
 
-const layout = lpLayout.doLayout({nodes, edges})
+const layout = lpLayout.doLayout({nodes, edges}, {xSpacing: 0.2, ySpacing: 0.2})
 
 console.log(layout)
 
