@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@rescript/std": "10.1.1",
-    "@ellbur/javascript-lp-solver": "^0.4.25"
+    "@ellbur/javascript-lp-solver": "^0.4.26"
   },
   "devDependencies": {
     "rescript": "10.1.1"
