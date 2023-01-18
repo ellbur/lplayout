@@ -1,16 +1,16 @@
 {
   "name": "@ellbur/lplayout",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "main": "lib/js/src/main/LPLayout.bs.js",
   "scripts": {
     "build": "rescript build -with-deps",
     "clean": "rescript clean -with-deps"
   },
   "dependencies": {
-    "@rescript/std": "10.0.1",
+    "@rescript/std": "10.1.1",
     "javascript-lp-solver": "^0.4.24"
   },
   "devDependencies": {
-    "rescript": "10.0.1"
+    "rescript": "10.1.1"
   }
 }
