@@ -8,13 +8,12 @@ type model<'c, 'v> = {
   variables: JsMap.t as 'v,
 }
 
-%%raw(`
-import __solver from 'javascript-lp-solver';
-function __solve(x) {
-  return __solver.Solve(x);
-}
-`)
+type jsLPSolver
 
-let ucSolve: (.model<'c, 'v>) => JsMap.t = %raw("__solve")
-let solve: model<'c, 'v> => JsMap.t = m => ucSolve(. m)
+@module("@ellbur/javascript-lp-solver") @new external newJSLPSolver: () => jsLPSolver = "default";
+let jsLPSolver = newJSLPSolver()
+
+@send external methSolve: (jsLPSolver, model<'c, 'v>) => JsMap.t = "Solve"
+
+let solve: model<'c, 'v> => JsMap.t = jsLPSolver->methSolve
 
