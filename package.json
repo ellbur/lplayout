@@ -1,5 +1,6 @@
 {
   "name": "@ellbur/lplayout",
+  "type": "module",
   "version": "1.1.2",
   "main": "lib/js/src/main/LPLayout.bs.js",
   "scripts": {

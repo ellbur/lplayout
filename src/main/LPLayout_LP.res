@@ -8,5 +8,13 @@ type model<'c, 'v> = {
   variables: JsMap.t as 'v,
 }
 
-@module("javascript-lp-solver") external solve: model<'c, 'v> => JsMap.t = "Solve"
+%%raw(`
+import __solver from 'javascript-lp-solver';
+function __solve(x) {
+  return __solver.Solve(x);
+}
+`)
+
+let ucSolve: (.model<'c, 'v>) => JsMap.t = %raw("__solve")
+let solve: model<'c, 'v> => JsMap.t = m => ucSolve(. m)
 
