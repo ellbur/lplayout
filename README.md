@@ -15,14 +15,14 @@ npm i @ellbur/lplayout
 open LPLayout.Graph
 
 let nodes = [
-  { id: "a", width: 1.0, height: 1.0 },
-  { id: "b", width: 1.0, height: 1.0 },
-  { id: "c", width: 1.0, height: 1.0 },
-  { id: "d", width: 1.0, height: 1.0 },
-  { id: "e", width: 1.0, height: 1.0 },
-  { id: "f", width: 1.0, height: 1.0 },
-  { id: "g", width: 1.0, height: 1.0 },
-  { id: "h", width: 1.0, height: 1.0 },
+  { id: "a", width: 1.0, height: 1.0, marginTop: 0.0, marginLeft: 0.0, marginBottom: 0.0, marginRight: 0.0 },
+  { id: "b", width: 1.0, height: 1.0, marginTop: 0.0, marginLeft: 0.0, marginBottom: 0.0, marginRight: 0.0 },
+  { id: "c", width: 1.0, height: 1.0, marginTop: 0.0, marginLeft: 0.0, marginBottom: 0.0, marginRight: 0.0 },
+  { id: "d", width: 1.0, height: 1.0, marginTop: 0.0, marginLeft: 0.0, marginBottom: 0.0, marginRight: 0.0 },
+  { id: "e", width: 1.0, height: 1.0, marginTop: 0.0, marginLeft: 0.0, marginBottom: 0.0, marginRight: 0.0 },
+  { id: "f", width: 1.0, height: 1.0, marginTop: 0.0, marginLeft: 0.0, marginBottom: 0.0, marginRight: 0.0 },
+  { id: "g", width: 1.0, height: 1.0, marginTop: 0.0, marginLeft: 0.0, marginBottom: 0.0, marginRight: 0.0 },
+  { id: "h", width: 1.0, height: 1.0, marginTop: 0.0, marginLeft: 0.0, marginBottom: 0.0, marginRight: 0.0 },
 ]
   
 let edges = [
@@ -76,14 +76,14 @@ Although written in ReScript, the code is usable from JavaScript. The above exam
 const lplayout = require('@ellbur/lplayout');
 
 const nodes = [
-  { id: "a", width: 1.0, height: 1.0 },
-  { id: "b", width: 1.0, height: 1.0 },
-  { id: "c", width: 1.0, height: 1.0 },
-  { id: "d", width: 1.0, height: 1.0 },
-  { id: "e", width: 1.0, height: 1.0 },
-  { id: "f", width: 1.0, height: 1.0 },
-  { id: "g", width: 1.0, height: 1.0 },
-  { id: "h", width: 1.0, height: 1.0 },
+  { id: "a", width: 1.0, height: 1.0, marginTop: 0.0, marginLeft: 0.0, marginBottom: 0.0, marginRight: 0.0 },
+  { id: "b", width: 1.0, height: 1.0, marginTop: 0.0, marginLeft: 0.0, marginBottom: 0.0, marginRight: 0.0 },
+  { id: "c", width: 1.0, height: 1.0, marginTop: 0.0, marginLeft: 0.0, marginBottom: 0.0, marginRight: 0.0 },
+  { id: "d", width: 1.0, height: 1.0, marginTop: 0.0, marginLeft: 0.0, marginBottom: 0.0, marginRight: 0.0 },
+  { id: "e", width: 1.0, height: 1.0, marginTop: 0.0, marginLeft: 0.0, marginBottom: 0.0, marginRight: 0.0 },
+  { id: "f", width: 1.0, height: 1.0, marginTop: 0.0, marginLeft: 0.0, marginBottom: 0.0, marginRight: 0.0 },
+  { id: "g", width: 1.0, height: 1.0, marginTop: 0.0, marginLeft: 0.0, marginBottom: 0.0, marginRight: 0.0 },
+  { id: "h", width: 1.0, height: 1.0, marginTop: 0.0, marginLeft: 0.0, marginBottom: 0.0, marginRight: 0.0 },
 ];
   
 const edges = [

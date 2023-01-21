@@ -49,7 +49,11 @@ let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions)
         {
           id: edgeID ++ `_synth_node_${i->Belt.Int.toString}`,
           width: 0.0,
-          height: 0.0
+          height: 0.0,
+          marginLeft: 0.0,
+          marginBottom: 0.0,
+          marginTop: 0.0,
+          marginRight: 0.0
         }
       })
       
@@ -184,12 +188,14 @@ let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions)
         let node1 = nodeIDs[i]
         let node2 = nodeIDs[i+1]
         
-        let {width: widthN1} = idMap->Belt.Map.getExn(node1)
-        let {width: widthN2} = idMap->Belt.Map.getExn(node2)
+        let {width: widthN1, marginRight: marginRightN1} = idMap->Belt.Map.getExn(node1)
+        let {width: widthN2, marginLeft: marginLeftN2} = idMap->Belt.Map.getExn(node2)
         let width1 = widthN1 /. averageWidth
+        let marginRight1 = marginRightN1 /. averageWidth
         let width2 = widthN2 /. averageWidth
+        let marginLeft2 = marginLeftN2 /. averageWidth
         
-        let separation = 0.5 *. (width1 +. width2) +. horizontalSpacing
+        let separation = 0.5 *. (width1 +. marginRight1 +. marginLeft2 +. width2) +. horizontalSpacing
         
         variables->set(overlapVar(node1, node2), {"badness": overlapBadness})
         constraints->set(indexVar(overlapVar(node1, node2)), {"min": separation})
@@ -246,7 +252,7 @@ let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions)
   
   let levelHeights = siftedLevelGroupings->Js.Array2.map(group =>
     group->Js.Array2.map(id => idMap->Belt.Map.getExn(id))
-      ->Js.Array2.map(({height}) => height)
+      ->Js.Array2.map(({height, marginTop, marginBottom}) => height +. marginTop +. marginBottom)
       ->Belt.Array.reduce(0.0, Js.Math.max_float)
   )
 
@@ -262,21 +268,15 @@ let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions)
     accumHeights[levelHeights->Belt.Array.length] = accum.contents
   }
   
-  let midHeights = Belt.Array.make(levelHeights->Belt.Array.length, 0.0)
-
-  {
-    let len = levelHeights->Belt.Array.length
-    let rec step = i => {
-      if i < len {
-        midHeights[i] = 0.5*.(accumHeights[i] +. accumHeights[i + 1])
-        step(i + 1)
-      }
-    }
-    step(0)
-  }
-  
-  levelMap->Js.Dict.entries->Belt.Array.forEach(((nodeID, level)) =>
-    nodeCenterYs->Js.Dict.set(nodeID, midHeights[level]))
+  levelMap->Js.Dict.entries->Belt.Array.forEach(((nodeID, level)) => {
+    let {marginTop, marginBottom} = idMap->Belt.Map.getExn(nodeID)
+    let h1 = accumHeights[level]
+    let h2 = accumHeights[level + 1]
+    let h1 = h1 +. marginTop
+    let h2 = h2 -. marginBottom
+    let midHeight = 0.5 *. (h1 +. h2)
+    nodeCenterYs->Js.Dict.set(nodeID, midHeight)
+  })
   
   augmentedNodes->Js.Array2.forEach(({id: nodeId}) =>
     nodeCenterXs->Js.Dict.set(nodeId, 

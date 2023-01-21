@@ -2,7 +2,11 @@
 type node = {
   id: string,
   width: float,
-  height: float
+  height: float,
+  marginLeft: float,
+  marginRight: float,
+  marginTop: float,
+  marginBottom: float,
 }
 
 type edge = {

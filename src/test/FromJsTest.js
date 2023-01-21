@@ -1,15 +1,15 @@
 
-const lpLayout = require('../../lib/js/src/main/LPLayout.bs')
+import { doLayout } from '../../lib/es6/src/main/LPLayout.bs.js';
 
 const nodes = [
-  { id: "a", width: 1.0, height: 1. },
-  { id: "b", width: 1.0, height: 1. },
-  { id: "c", width: 1.0, height: 1. },
-  { id: "d", width: 1.0, height: 1. },
-  { id: "e", width: 1.0, height: 1. },
-  { id: "f", width: 1.0, height: 1. },
-  { id: "g", width: 1.0, height: 1. },
-  { id: "h", width: 1.0, height: 1. },
+  { id: "a", width: 1.0, height: 1.0, marginTop: 0.0, marginLeft: 0.0, marginBottom: 0.0, marginRight: 0.0 },
+  { id: "b", width: 1.0, height: 1.0, marginTop: 0.0, marginLeft: 0.0, marginBottom: 0.0, marginRight: 0.0 },
+  { id: "c", width: 1.0, height: 1.0, marginTop: 0.0, marginLeft: 0.0, marginBottom: 0.0, marginRight: 0.0 },
+  { id: "d", width: 1.0, height: 1.0, marginTop: 0.0, marginLeft: 0.0, marginBottom: 0.0, marginRight: 0.0 },
+  { id: "e", width: 1.0, height: 1.0, marginTop: 0.0, marginLeft: 0.0, marginBottom: 0.0, marginRight: 0.0 },
+  { id: "f", width: 1.0, height: 1.0, marginTop: 0.0, marginLeft: 0.0, marginBottom: 0.0, marginRight: 0.0 },
+  { id: "g", width: 1.0, height: 1.0, marginTop: 0.0, marginLeft: 0.0, marginBottom: 0.0, marginRight: 0.0 },
+  { id: "h", width: 1.0, height: 1.0, marginTop: 0.0, marginLeft: 0.0, marginBottom: 0.0, marginRight: 0.0 },
 ]
   
 const edges = [
@@ -23,7 +23,7 @@ const edges = [
   { edgeID: "hd", source: "h", sink: "d", sinkPos: 0.0 },
 ]
 
-const layout = lpLayout.doLayout({nodes, edges}, {xSpacing: 0.2, ySpacing: 0.2})
+const layout = doLayout({nodes, edges}, {xSpacing: 0.2, ySpacing: 0.2})
 
 console.log(layout)
 
