@@ -195,7 +195,7 @@ let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions)
         let width2 = widthN2 /. averageWidth
         let marginLeft2 = marginLeftN2 /. averageWidth
         
-        let separation = 0.5 *. (width1 +. marginRight1 +. marginLeft2 +. width2) +. horizontalSpacing
+        let separation = 0.5 *. (width1 +. width2) +. horizontalSpacing +. marginRight1 +. marginLeft2
         
         variables->set(overlapVar(node1, node2), {"badness": overlapBadness})
         constraints->set(indexVar(overlapVar(node1, node2)), {"min": separation})
@@ -284,9 +284,9 @@ let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions)
     )
   )
     
-  let overhangs = augmentedNodes->Js.Array2.map(({id, width}) => {
+  let overhangs = augmentedNodes->Js.Array2.map(({id, width, marginLeft}) => {
     let cx = nodeCenterXs->Js.Dict.unsafeGet(id)
-    let overhang = (width/.2.0) +. (horizontalSpacing*.averageWidth/.2.0) -. cx
+    let overhang = (width/.2.0) +. (horizontalSpacing*.averageWidth/.2.0) +. marginLeft -. cx
     overhang
   })
   let worstOverhang = overhangs->Belt.Array.reduce(0.0, Js.Math.max_float)
