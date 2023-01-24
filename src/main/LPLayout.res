@@ -20,6 +20,11 @@ let sum = x => x->Belt.Array.reduce(0.0, (a, b) => a +. b)
 
 let average = x => sum(x)/.(Belt.Array.length(x)->Belt.Int.toFloat)
 
+let getOrElse: (option<'x>, () => 'x) => 'x = (o, f) => switch o {
+  | None => f()
+  | Some(x) => x
+}
+
 let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions) => {
   let averageWidth = average(nodes->Js.Array2.map(({width}) => width +. layoutOptions.xSpacing))
   let averageHeight = average(nodes->Js.Array2.map(({height}) => height +. layoutOptions.ySpacing))
@@ -41,8 +46,10 @@ let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions)
   
   let augmentedEdges = edges->Belt.Array.flatMap(edge => {
     let {edgeID, source, sink, sinkPos} = edge
-    let sourceLevel = levelMap->Js.Dict.get(source)->Belt.Option.getExn
-    let sinkLevel = levelMap->Js.Dict.get(sink)->Belt.Option.getExn
+    let sourceLevel = levelMap->Js.Dict.get(source)->getOrElse(() => Js.Exn.raiseError(`Malformed graph: edge ${edgeID} has ` ++
+      `source ${source} not among nodes [${nodes->Belt.Array.joinWith(", ", n => n.id)}]`))
+    let sinkLevel = levelMap->Js.Dict.get(sink)->getOrElse(() => Js.Exn.raiseError(`Malformed graph: edge ${edgeID} has ` ++
+      `sink ${sink} not among nodes [${nodes->Belt.Array.joinWith(", ", n => n.id)}]`))
     
     if sourceLevel > sinkLevel + 1 {
       let syntheticNodes = Belt.Array.makeBy(sourceLevel - sinkLevel - 1, i => {
