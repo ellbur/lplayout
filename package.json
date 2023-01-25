@@ -4,14 +4,19 @@
   "version": "1.2.2",
   "main": "lib/js/src/main/LPLayout.bs.js",
   "scripts": {
-    "build": "rescript build -with-deps",
-    "clean": "rescript clean -with-deps"
+    "build:rs": "rescript build -with-deps",
+    "build:copy": "rsync -r --include='*/' --include='*.json' --exclude='*' src/ lib/es6/src/",
+    "build": "npm run build:rs && npm run build:copy",
+    "clean": "rescript clean -with-deps",
+    "dev": "vite"
   },
   "dependencies": {
     "@rescript/std": "10.1.1",
     "@ellbur/javascript-lp-solver": "^0.4.26"
   },
   "devDependencies": {
-    "rescript": "10.1.1"
+    "rescript": "10.1.1",
+    "rescript-webapi": "0.6.1",
+    "vite": "^4.0.4"
   }
 }

@@ -26,6 +26,8 @@ let getOrElse: (option<'x>, () => 'x) => 'x = (o, f) => switch o {
 }
 
 let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions) => {
+  Js.Console.log("Hi")
+  
   let averageWidth = average(nodes->Js.Array2.map(({width}) => width +. layoutOptions.xSpacing))
   let averageHeight = average(nodes->Js.Array2.map(({height}) => height +. layoutOptions.ySpacing))
   
@@ -102,27 +104,7 @@ let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions)
   
   let augmentedSourceMap = buildSourceMap(augmentedEdges)
   
-  let rootCounter = ref(0.0)
-  let xIndexMap = doDFSCalc(
-    augmentedNodes,
-    augmentedSourceMap,
-    ~root = _ => {
-      let x = rootCounter.contents
-      rootCounter.contents = rootCounter.contents +. 1.0
-      x
-    },
-    ~nonRoot = (nodeID, sourceYIndices) => {
-      let level = levelMap->Js.Dict.unsafeGet(nodeID)
-      let scale = Js.Math.pow_float(~base=0.5, ~exp=level->Belt.Int.toFloat)
-      let influences = sourceYIndices->Js.Array2.map((({sinkPos}, influence)) =>
-        influence +. (scale*.sinkPos))
-      
-      let average = ( influences->Js.Array2.reduce((x, y) => x +. y, 0.0) ) /.
-        ( influences->Js.Array2.length->Belt.Int.toFloat )
-        
-      average
-    }
-  )
+  let xIndexMap = LPLayout_XIndexCalcs.buildXIndexMapV0(augmentedNodes, augmentedSourceMap, levelMap)
 
   let maxLevel = levelMap->Js.Dict.values->Js.Array2.reduce(Js.Math.max_int, 0)
   let numLevels = maxLevel + 1
