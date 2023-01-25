@@ -292,46 +292,14 @@ let renderGraph = (~document: Document.t, ~svg: Element.t, ~graph: SVGGraph.grap
         ~fontSize=nodeMetrics.nodeFontSize,
         ~fontFamily=nodeMetrics.nodeFontFamily,
         ~class="node-text",
-        ~textContent=label,
+        ~textContent=".",
         ()
       )
       
-      let lowerLeftElem: option<Element.t> = nodeAnnotations.lowerLeft->Belt.Option.map(textContent => document->text(
-        ~textAnchor="end",
-        ~dominantBaseline="auto",
-        ~fontSize=nodeMetrics.nodeSideTextFontSize,
-        ~fontFamily=nodeMetrics.nodeSideTextFontFamily,
-        ~class="node-annotation node-annotation-lower-left",
-        ~textContent,
-        ()
-      ))
-      let upperLeftElem: option<Element.t> = nodeAnnotations.upperLeft->Belt.Option.map(textContent => document->text(
-        ~textAnchor="end",
-        ~dominantBaseline="hanging",
-        ~fontSize=nodeMetrics.nodeSideTextFontSize,
-        ~fontFamily=nodeMetrics.nodeSideTextFontFamily,
-        ~class="node-annotation node-annotation-upper-left",
-        ~textContent,
-        ()
-      ))
-      let lowerRightElem: option<Element.t> = nodeAnnotations.lowerRight->Belt.Option.map(textContent => document->text(
-        ~textAnchor="start",
-        ~dominantBaseline="auto",
-        ~fontSize=nodeMetrics.nodeSideTextFontSize,
-        ~fontFamily=nodeMetrics.nodeSideTextFontFamily,
-        ~class="node-annotation node-annotation-lower-right",
-        ~textContent,
-        ()
-      ))
-      let upperRightElem: option<Element.t> = nodeAnnotations.upperRight->Belt.Option.map(textContent => document->text(
-        ~textAnchor="start",
-        ~dominantBaseline="hanging",
-        ~fontSize=nodeMetrics.nodeSideTextFontSize,
-        ~fontFamily=nodeMetrics.nodeSideTextFontFamily,
-        ~class="node-annotation node-annotation-upper-right",
-        ~textContent,
-        ()
-      ))
+      let lowerLeftElem: option<Element.t> = None
+      let upperLeftElem: option<Element.t> = None
+      let lowerRightElem: option<Element.t> = None
+      let upperRightElem: option<Element.t> = None
       
       let nodeChildren = [Some(rectElem), Some(textElem), lowerLeftElem, upperLeftElem, lowerRightElem, upperRightElem]->Belt.Array.flatMap(el =>
         el->Belt.Option.mapWithDefault([], x => [x])
@@ -351,8 +319,8 @@ let renderGraph = (~document: Document.t, ~svg: Element.t, ~graph: SVGGraph.grap
       }))->Belt.Array.reduce(0.0, Js.Math.max_float)
       
       let {width: textWidth, height: textHeight} = textElem->getBBox
-      let rectWidth = textWidth +. 2.0*.nodeMetrics.nodeHorizontalPadding
-      let rectHeight = textHeight +. 2.0*.nodeMetrics.nodeVerticalPadding
+      let rectWidth = textWidth
+      let rectHeight = textHeight
       
       rectElem->Element.setAttribute("x", fts(leftAnnotationSize))
       rectElem->Element.setAttribute("y", "0")
@@ -456,7 +424,7 @@ let renderGraph = (~document: Document.t, ~svg: Element.t, ~graph: SVGGraph.grap
     })
   }
   
-  let layout = LPLayout.doLayout(lpGraph, {xSpacing: graph.graphMetrics.xSpacing, ySpacing: graph.graphMetrics.ySpacing})
+  let layout = LPLayout.doLayout(lpGraph, {xSpacing: 40.0, ySpacing: 20.0})
   let {nodeCenterXs, nodeCenterYs, edgeExtraNodes} = layout
   
   graph.nodes->Belt.Array.forEach(node => {
