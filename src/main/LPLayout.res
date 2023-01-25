@@ -104,51 +104,7 @@ let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions)
   
   let augmentedSourceMap = buildSourceMap(augmentedEdges)
   
-  let style: [#new | #old] = #old
-  
-  let siftedLevelGroupings = switch style {
-    | #old => {
-      let xIndexMap = LPLayout_XIndexCalcs.buildXIndexMapV1(augmentedNodes, augmentedSourceMap, levelMap)
-
-      let maxLevel = levelMap->Js.Dict.values->Js.Array2.reduce(Js.Math.max_int, 0)
-      let numLevels = maxLevel + 1
-
-      module NodeWithXIndex = {
-        type t = {
-          nodeID: string,
-          xIndex: float
-        }
-      }
-
-      let levelGroupings: array<array<NodeWithXIndex.t>> = Belt.Array.makeBy(numLevels, _ => [ ])
-      levelMap->Js.Dict.entries->Belt.Array.forEach(((nodeID, level)) => {
-        let levelArray = levelGroupings[level]
-        levelArray->Js.Array2.push({
-          NodeWithXIndex.nodeID: nodeID,
-          NodeWithXIndex.xIndex: xIndexMap->Js.Dict.unsafeGet(nodeID)
-        })->ignore
-      })
-
-      let compFloat = (a, b) =>
-        if a < b {
-          -1
-        }
-        else if a > b {
-          +1
-        }
-        else {
-          0
-        }
-
-      levelGroupings->Js.Array2.forEach(ar => ar->Belt.SortArray.stableSortInPlaceBy(
-        ({NodeWithXIndex.xIndex: y1}, {NodeWithXIndex.xIndex: y2}) => compFloat(y1, y2)))
-
-      levelGroupings->Js.Array2.map(ar => ar->Js.Array2.map(({NodeWithXIndex.nodeID: n}) => n))
-    }
-    | #new => {
-      LPLayout_XIndexCalcs.buildXIndexMapV2(augmentedSourceMap, levelMap)
-    }
-  }
+  let siftedLevelGroupings = LPLayout_XIndexCalcs.buildXIndexMapV2(augmentedSourceMap, levelMap)
   
   let idMap = augmentedNodes->Js.Array2.map(node => {let {id} = node; (id, node)})
     ->Belt.Map.fromArray(~id=module(StringComp))

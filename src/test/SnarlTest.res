@@ -275,7 +275,7 @@ let renderGraph = (~document: Document.t, ~svg: Element.t, ~graph: SVGGraph.grap
   
   {
     let {SVGGraph.nodes: nodes} = graph
-    nodes->Belt.Array.forEach(({id, text: label, nodeAnnotations, nodeMetrics}) => {
+    nodes->Belt.Array.forEach(({id, nodeMetrics}) => {
       let rectElem = document->rect(
         ~rx=nodeMetrics.nodeRoundingX->Belt.Float.toString,
         ~ry=nodeMetrics.nodeRoundingY->Belt.Float.toString,
