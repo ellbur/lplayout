@@ -1,7 +1,7 @@
 {
   "name": "@ellbur/lplayout",
   "type": "module",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "main": "lib/js/src/main/LPLayout.bs.js",
   "scripts": {
     "build:rs": "rescript build -with-deps",
