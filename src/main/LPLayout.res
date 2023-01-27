@@ -26,8 +26,6 @@ let getOrElse: (option<'x>, () => 'x) => 'x = (o, f) => switch o {
 }
 
 let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions) => {
-  Js.Console.log("Hi")
-  
   let averageWidth = average(nodes->Js.Array2.map(({width}) => width +. layoutOptions.xSpacing))
   let averageHeight = average(nodes->Js.Array2.map(({height}) => height +. layoutOptions.ySpacing))
   
