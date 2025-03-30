@@ -82,8 +82,8 @@ let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions)
       Belt.Array.makeBy(sourceLevel - sinkLevel, i => {
         {
           edgeID: `${edgeID}_pos_${i->Belt.Int.toString}`,
-          source: involvedNodeIDs[i+1],
-          sink: involvedNodeIDs[i],
+          source: involvedNodeIDs[i+1]->Option.getExn,
+          sink: involvedNodeIDs[i]->Option.getExn,
           sinkPos: {
             if i == 0 {
               sinkPos
@@ -137,8 +137,8 @@ let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions)
       if i < Js.Array2.length(nodeIDs)-1 {
         open JsMap
         
-        let node1 = nodeIDs[i]
-        let node2 = nodeIDs[i+1]
+        let node1 = nodeIDs[i]->Option.getExn
+        let node2 = nodeIDs[i+1]->Option.getExn
         
         let {width: widthN1, marginRight: marginRightN1} = idMap->Belt.Map.getExn(node1)
         let {width: widthN2, marginLeft: marginLeftN2} = idMap->Belt.Map.getExn(node2)
@@ -222,8 +222,8 @@ let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions)
   
   levelMap->Js.Dict.entries->Belt.Array.forEach(((nodeID, level)) => {
     let {marginTop, marginBottom} = idMap->Belt.Map.getExn(nodeID)
-    let h1 = accumHeights[level]
-    let h2 = accumHeights[level + 1]
+    let h1 = accumHeights[level]->Option.getExn
+    let h2 = accumHeights[level + 1]->Option.getExn
     let h1 = h1 +. marginTop
     let h2 = h2 -. marginBottom
     let midHeight = 0.5 *. (h1 +. h2)

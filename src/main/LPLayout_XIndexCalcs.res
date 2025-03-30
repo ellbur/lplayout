@@ -7,14 +7,14 @@ let buildXIndexMapV2 = (sourceMap: Js.Dict.t<array<Graph.edge>>, levelMap) => {
   let numLevels = maxLevel + 1
   let levelGroupings: array<array<string>> = Belt.Array.makeBy(numLevels, _ => [ ])
   levelMap->Js.Dict.entries->Belt.Array.forEach(((nodeID, level)) => {
-    let levelArray = levelGroupings[level]
+    let levelArray = levelGroupings[level]->Option.getExn
     levelArray->Js.Array2.push(nodeID)->ignore
   })
   
   let rec step = i => {
     if i < numLevels {
-      let previousRow = levelGroupings[i-1]
-      let currentRow = levelGroupings[i]
+      let previousRow = levelGroupings[i-1]->Option.getExn
+      let currentRow = levelGroupings[i]->Option.getExn
       
       let prevRowIndexMap = Js.Dict.empty()
       previousRow->Belt.Array.forEachWithIndex((i, node) => {
@@ -46,13 +46,13 @@ let buildXIndexMapV2 = (sourceMap: Js.Dict.t<array<Graph.edge>>, levelMap) => {
             0.0
           }
           else if numScores == 1 {
-            individualScores[0]
+            individualScores[0]->Option.getExn
           }
           else if mod(numScores, 2) == 0 {
-            0.5*.(individualScores[half] +. individualScores[half+1])
+            0.5*.((individualScores[half]->Option.getExn) +. (individualScores[half+1]->Option.getExn))
           }
           else {
-            individualScores[half]
+            individualScores[half]->Option.getExn
           }
         }
         currentRowScoreMap->Js.Dict.set(node, median)

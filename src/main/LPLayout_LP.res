@@ -15,5 +15,5 @@ let jsLPSolver = newJSLPSolver()
 
 @send external methSolve: (jsLPSolver, model<'c, 'v>) => JsMap.t = "Solve"
 
-let solve: model<'c, 'v> => JsMap.t = jsLPSolver->methSolve
+let solve: model<'c, 'v> => JsMap.t = model => jsLPSolver->methSolve(model)
 

@@ -1,0 +1,28 @@
+{
+  "name": "@ellbur/lplayout",
+  "sources": [
+    {
+      "dir": "src/main",
+      "subdirs": true,
+    },
+    {
+      "dir": "src/test",
+      "subdirs": true,
+      "type": "dev"
+    }
+  ],
+  "package-specs": {
+    "module": "esmodule",
+    "in-source": false
+  },
+  "suffix": ".res.mjs",
+  "bs-dependencies": [
+    "@rescript/core"
+  ],
+  "bs-dev-dependencies": [
+    "rescript-webapi"
+  ],
+  "bsc-flags": [
+    "-open RescriptCore"
+  ]
+}

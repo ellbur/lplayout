@@ -154,7 +154,7 @@ module SVGUtils = {
     el->sa("font-size", fontSize)
     el->sa("font-family", fontFamily)
     el->sa("class", class)
-    textContent->Belt.Option.forEach(el->Element.setTextContent)
+    textContent->Belt.Option.forEach(c => el->Element.setTextContent(c))
     el
   }
 
@@ -483,8 +483,8 @@ let renderGraph = (~document: Document.t, ~svg: Element.t, ~graph: SVGGraph.grap
       let len = pointsToTravelThrough->Js.Array2.length
       let rec step = i => {
         if i < len {
-          let p1 = pointsToTravelThrough[i-1]
-          let p2 = pointsToTravelThrough[i]
+          let p1 = pointsToTravelThrough[i-1]->Option.getExn
+          let p2 = pointsToTravelThrough[i]->Option.getExn
           
           let (x1, y1) = p1
           let (x2, y2) = p2
