@@ -57,7 +57,9 @@ module SVGGraph = {
   }
 }
 
-@module external graph: SVGGraph.graph = "./snarl-test-data.json"
+external coerce: 'a => 'b = "%identity"
+
+let graph: SVGGraph.graph = SnarlTestData.testData->coerce
 
 Js.Console.log(graph)
 

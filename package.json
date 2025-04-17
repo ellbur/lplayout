@@ -1,14 +1,16 @@
 {
   "name": "@ellbur/lplayout",
   "version": "1.2.5",
+  "decription": "Simple DAG layout",
+  "author": "Owen Healy <owen@owenehealy.com>",
+  "license": "WTFPL (http://www.wtfpl.net)",
   "type": "module",
   "main": "lib/es6/src/main/LPLayout.res.mjs",
   "scripts": {
     "res:build": "rescript",
     "res:clean": "rescript clean",
     "res:dev": "rescript -w",
-    "build:copy": "rsync -r --include='*/' --include='*.json' --exclude='*' src/ lib/es6/src/",
-    "build": "npm run res:build && npm run build:copy",
+    "build": "npm run res:build",
     "dev": "vite"
   },
   "devDependencies": {
