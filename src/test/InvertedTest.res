@@ -74,7 +74,7 @@ let edgeMetrics: SVGGraph.edgeMetrics = {
   edgeStrokeWidth: "1px",
   edgeSinkLabelFontSize: "12pt",
   edgeSinkLabelFontFamily: "'Noto Sans'",
-  edgeSinkLabelXOffset: 5.0,
+  edgeSinkLabelXOffset: 8.0,
   edgeSinkLabelYOffset: 5.0,
   edgeRectangularness: 1.0,
 }
@@ -88,16 +88,18 @@ let graph: SVGGraph.graph = {
     { id: "e", text: "e", nodeAnnotations: { }, nodeMetrics },
   ],
   edges: [
-    { edgeID: "ab", source: "a", sink: "b", sinkPos: 0.0, sinkLabel: "", edgeMetrics },
-    { edgeID: "ac", source: "a", sink: "c", sinkPos: 0.0, sinkLabel: "", edgeMetrics },
-    { edgeID: "cd", source: "c", sink: "d", sinkPos: 0.0, sinkLabel: "", edgeMetrics },
-    { edgeID: "ce", source: "c", sink: "e", sinkPos: 0.0, sinkLabel: "", edgeMetrics },
+    { edgeID: "ab", source: "a", sink: "b", sinkPos: 0.0, sinkLabel: "ab", edgeMetrics },
+    { edgeID: "ac", source: "a", sink: "c", sinkPos: 0.0, sinkLabel: "ac", edgeMetrics },
+    { edgeID: "cd", source: "c", sink: "d", sinkPos: 0.0, sinkLabel: "cd", edgeMetrics },
+    { edgeID: "ce", source: "c", sink: "e", sinkPos: 0.0, sinkLabel: "ce", edgeMetrics },
   ],
   graphMetrics: {
     xSpacing: 25.0,
     ySpacing: 75.0,
   }
 }
+
+let orientation = LPLayout.FlowingDown
 
 module Document = Webapi.Dom.Document
 module Element = Webapi.Dom.Element
@@ -410,9 +412,13 @@ let renderGraph = (~document: Document.t, ~svg: Element.t, ~graph: SVGGraph.grap
         ()
       )
         
+      let edgeSinkLabelBaseline = switch orientation {
+        | FlowingUp => "hanging"
+        | FlowingDown => "auto"
+      }
       let edgeSinkText = document->text(
         ~textAnchor="start",
-        ~dominantBaseline="hanging",
+        ~dominantBaseline=edgeSinkLabelBaseline,
         ~fontSize=edgeMetrics.edgeSinkLabelFontSize,
         ~fontFamily=edgeMetrics.edgeSinkLabelFontFamily,
         ~class="edge-sink-text",
@@ -463,7 +469,7 @@ let renderGraph = (~document: Document.t, ~svg: Element.t, ~graph: SVGGraph.grap
     })
   }
   
-  let layout = LPLayout.doLayout(lpGraph, {xSpacing: graph.graphMetrics.xSpacing, ySpacing: graph.graphMetrics.ySpacing, orientation: LPLayout.FlowingDown})
+  let layout = LPLayout.doLayout(lpGraph, {xSpacing: graph.graphMetrics.xSpacing, ySpacing: graph.graphMetrics.ySpacing, orientation})
   let {nodeCenterXs, nodeCenterYs, edgeExtraNodes} = layout
   
   graph.nodes->Belt.Array.forEach(node => {
@@ -501,10 +507,16 @@ let renderGraph = (~document: Document.t, ~svg: Element.t, ~graph: SVGGraph.grap
     let boxHeight2 = sinkRendering.NodeRendering.nodeBoxHeight
     
     let xStart = cx1
-    let yStart = cy1 -. boxHeight1/.2.0
+    let yStart = switch orientation {
+      | FlowingUp => cy1 -. boxHeight1/.2.0
+      | FlowingDown => cy1 +. boxHeight1/.2.0
+    }
     
     let xEnd = cx2 +. sinkPos*.boxFlatWidth2*.0.9/.2.0
-    let yEnd = cy2 +. boxHeight2/.2.0 +. 10.0
+    let yEnd = switch orientation {
+      | FlowingUp => cy2 +. boxHeight2/.2.0 +. 10.0
+      | FlowingDown => cy2 -. boxHeight2/.2.0 -. 10.0
+    }
     
     let pointsToTravelThrough = [(xStart, yStart)]
     edgeExtraNodes->Js.Dict.get(edgeID)->Belt.Option.forEach(extraNodes => {
@@ -545,7 +557,11 @@ let renderGraph = (~document: Document.t, ~svg: Element.t, ~graph: SVGGraph.grap
     pathElem->setAttribute("d", workingD.contents)
     
     sinkLabelElem->setAttribute("x", fts(xEnd +. edgeMetrics.edgeSinkLabelXOffset))
-    sinkLabelElem->setAttribute("y", fts(yEnd +. edgeMetrics.edgeSinkLabelYOffset))
+    let sinkLabelY = switch orientation {
+      | FlowingUp => yEnd +. edgeMetrics.edgeSinkLabelYOffset
+      | FlowingDown => yEnd +. 10.0 -. edgeMetrics.edgeSinkLabelYOffset
+    }
+    sinkLabelElem->setAttribute("y", fts(sinkLabelY))
   })
   
   let bbox = mainG->getBBox

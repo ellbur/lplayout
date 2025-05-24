@@ -139,9 +139,6 @@ let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions)
   
   let sol = solve(model)
   
-  let nodeCenterXs = Js.Dict.empty()
-  let nodeCenterYs = Js.Dict.empty()
-  
   let levelHeights = siftedLevelGroupings->Js.Array2.map(group =>
     group->Js.Array2.map(id => idMap->Belt.Map.getExn(id))
       ->Js.Array2.map(({height, marginTop, marginBottom}) => height +. marginTop +. marginBottom)
@@ -150,7 +147,7 @@ let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions)
 
   let accumHeights = Belt.Array.make((levelHeights->Belt.Array.length) + 1, 0.0)
   
-  {
+  let totalHeight = {
     let scaledVerticalSpacing = verticalSpacing *. averageHeight
     let accum = ref(0.0)
     levelHeights->Js.Array2.forEachi((h, i) => {
@@ -158,8 +155,10 @@ let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions)
       accum.contents = accum.contents +. h +. scaledVerticalSpacing
     })
     accumHeights[levelHeights->Belt.Array.length] = accum.contents
+    accum.contents
   }
   
+  let nodeCenterYs = Js.Dict.empty()
   levelMap->Js.Dict.entries->Belt.Array.forEach(((nodeID, level)) => {
     let {marginTop, marginBottom} = idMap->Belt.Map.getExn(nodeID)
     let h1 = accumHeights[level]->Option.getExn
@@ -167,9 +166,14 @@ let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions)
     let h1 = h1 +. marginTop
     let h2 = h2 -. marginBottom
     let midHeight = 0.5 *. (h1 +. h2)
-    nodeCenterYs->Js.Dict.set(nodeID, midHeight)
+    let centerY = switch layoutOptions.orientation {
+      | FlowingUp => midHeight
+      | FlowingDown => totalHeight -. midHeight
+    }
+    nodeCenterYs->Js.Dict.set(nodeID, centerY)
   })
   
+  let nodeCenterXs = Js.Dict.empty()
   augmentedNodes->Js.Array2.forEach(({id: nodeId}) =>
     nodeCenterXs->Js.Dict.set(nodeId, 
       ( sol->JsMap.getWithDefault(nodeId, 0.0) ) *. averageWidth
