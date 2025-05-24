@@ -11,19 +11,17 @@ type layout = {
   edgeExtraNodes: Js.Dict.t<array<string>>
 }
 
+type orientation = FlowingUp | FlowingDown
+
 type layoutOptions = {
   xSpacing: float,
-  ySpacing: float
+  ySpacing: float,
+  orientation: orientation
 }
 
 let sum = x => x->Belt.Array.reduce(0.0, (a, b) => a +. b)
 
 let average = x => sum(x)/.(Belt.Array.length(x)->Belt.Int.toFloat)
-
-let getOrElse: (option<'x>, () => 'x) => 'x = (o, f) => switch o {
-  | None => f()
-  | Some(x) => x
-}
 
 let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions) => {
   let averageWidth = average(nodes->Js.Array2.map(({width}) => width +. layoutOptions.xSpacing))
@@ -31,7 +29,7 @@ let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions)
   
   let sourceMap = buildSourceMap(edges)
   
-  let levelMap = doDFSCalc(
+  let levelMap: Js.Dict.t<int> = doDFSCalc(
     nodes,
     sourceMap,
     ~root = _ => 0,
@@ -40,66 +38,8 @@ let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions)
         ->Js.Array2.reduce(Js.Math.max_int, 0) + 1
   )
 
-  let augmentedNodes = Belt.Array.copy(nodes)
-  
-  let edgeExtraNodes = Js.Dict.empty()
-  
-  let augmentedEdges = edges->Belt.Array.flatMap(edge => {
-    let {edgeID, source, sink, sinkPos} = edge
-    let sourceLevel = levelMap->Js.Dict.get(source)->getOrElse(() => Js.Exn.raiseError(`Malformed graph: edge ${edgeID} has ` ++
-      `source ${source} not among nodes [${nodes->Belt.Array.joinWith(", ", n => n.id)}]`))
-    let sinkLevel = levelMap->Js.Dict.get(sink)->getOrElse(() => Js.Exn.raiseError(`Malformed graph: edge ${edgeID} has ` ++
-      `sink ${sink} not among nodes [${nodes->Belt.Array.joinWith(", ", n => n.id)}]`))
-    
-    if sourceLevel > sinkLevel + 1 {
-      let syntheticNodes = Belt.Array.makeBy(sourceLevel - sinkLevel - 1, i => {
-        {
-          id: edgeID ++ `_synth_node_${i->Belt.Int.toString}`,
-          width: 0.0,
-          height: 0.0,
-          marginLeft: 0.0,
-          marginBottom: 0.0,
-          marginTop: 0.0,
-          marginRight: 0.0
-        }
-      })
-      
-      syntheticNodes->Belt.Array.forEachWithIndex((i, node) => {
-        augmentedNodes->Belt.Array.push(node)
-        levelMap->Js.Dict.set(node.id, i + sinkLevel + 1)
-      })
-      
-      edgeExtraNodes->Js.Dict.set(edgeID, syntheticNodes->Belt.Array.reverse->Belt.Array.map(({id})=>id))
-      
-      let involvedNodeIDs = {
-        Belt.Array.concatMany([
-          [ sink ],
-          syntheticNodes->Belt.Array.map(({id}) => id),
-          [ source ]
-        ])
-      }
-      
-      Belt.Array.makeBy(sourceLevel - sinkLevel, i => {
-        {
-          edgeID: `${edgeID}_pos_${i->Belt.Int.toString}`,
-          source: involvedNodeIDs[i+1]->Option.getExn,
-          sink: involvedNodeIDs[i]->Option.getExn,
-          sinkPos: {
-            if i == 0 {
-              sinkPos
-            }
-            else {
-              0.0
-            }
-          }
-        }
-      })
-    }
-    else {
-      [edge]
-    }
-  })
-  
+  let (augmentedNodes, augmentedEdges, edgeExtraNodes) = LPLayout_EdgeAugmenting.augmentNodesAndEdges(levelMap, nodes, edges)
+
   let augmentedSourceMap = buildSourceMap(augmentedEdges)
   
   let siftedLevelGroupings = LPLayout_XIndexCalcs.buildXIndexMapV2(augmentedSourceMap, levelMap)

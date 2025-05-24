@@ -1,9 +1,12 @@
 
 module Graph = LPLayout_Graph
 
+type orientation = FlowingUp | FlowingDown
+
 type layoutOptions = {
   xSpacing: float,
-  ySpacing: float
+  ySpacing: float,
+  orientation: orientation
 }
 
 type layout = {

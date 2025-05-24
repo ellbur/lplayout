@@ -12,7 +12,7 @@ let edges = [
   { edgeID: "bc", source: "b", sink: "c", sinkPos: 1.0 },
 ]
 
-let layout = LPLayout.doLayout({nodes, edges}, { xSpacing: 0.2, ySpacing: 0.2 })
+let layout = LPLayout.doLayout({nodes, edges}, { xSpacing: 0.2, ySpacing: 0.2, orientation: FlowingUp })
 
 Js.Console.log(layout)
 

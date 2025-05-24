@@ -426,7 +426,7 @@ let renderGraph = (~document: Document.t, ~svg: Element.t, ~graph: SVGGraph.grap
     })
   }
   
-  let layout = LPLayout.doLayout(lpGraph, {xSpacing: 40.0, ySpacing: 20.0})
+  let layout = LPLayout.doLayout(lpGraph, {xSpacing: 40.0, ySpacing: 20.0, orientation: FlowingUp})
   let {nodeCenterXs, nodeCenterYs, edgeExtraNodes} = layout
   
   graph.nodes->Belt.Array.forEach(node => {

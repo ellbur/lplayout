@@ -99,8 +99,6 @@ let graph: SVGGraph.graph = {
   }
 }
 
-Js.Console.log(graph)
-
 module Document = Webapi.Dom.Document
 module Element = Webapi.Dom.Element
 
@@ -465,7 +463,7 @@ let renderGraph = (~document: Document.t, ~svg: Element.t, ~graph: SVGGraph.grap
     })
   }
   
-  let layout = LPLayout.doLayout(lpGraph, {xSpacing: graph.graphMetrics.xSpacing, ySpacing: graph.graphMetrics.ySpacing})
+  let layout = LPLayout.doLayout(lpGraph, {xSpacing: graph.graphMetrics.xSpacing, ySpacing: graph.graphMetrics.ySpacing, orientation: LPLayout.FlowingDown})
   let {nodeCenterXs, nodeCenterYs, edgeExtraNodes} = layout
   
   graph.nodes->Belt.Array.forEach(node => {
