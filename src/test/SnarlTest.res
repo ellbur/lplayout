@@ -419,6 +419,7 @@ let renderGraph = (~document: Document.t, ~svg: Element.t, ~graph: SVGGraph.grap
         edgeID,
         source,
         sink,
+        sourcePos: 0.0,
         sinkPos
       }: T.edge)
     })

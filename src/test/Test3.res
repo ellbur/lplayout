@@ -8,8 +8,8 @@ let nodes = [
 ]
 
 let edges = [
-  { edgeID: "ac", source: "a", sink: "c", sinkPos: -1.0 },
-  { edgeID: "bc", source: "b", sink: "c", sinkPos: 1.0 },
+  { edgeID: "ac", source: "a", sink: "c", sourcePos: 0.0, sinkPos: -1.0 },
+  { edgeID: "bc", source: "b", sink: "c", sourcePos: 0.0, sinkPos: 1.0 },
 ]
 
 let layout = LPLayout.doLayout({nodes, edges}, { xSpacing: 0.2, ySpacing: 0.2, orientation: FlowingUp })

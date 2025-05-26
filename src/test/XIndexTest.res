@@ -9,8 +9,8 @@ let sourceMap: Js.Dict.t<array<G.edge>> = Js.Dict.fromArray([
   ("a", []),
   ("b", []),
   ("c", []),
-  ("d", [{G.edgeID: "da", source: "d", sink: "a", sinkPos: -1.0}, {G.edgeID: "dc", source: "d", sink: "c", sinkPos: 0.0}]),
-  ("e", [{G.edgeID: "ea", source: "e", sink: "a", sinkPos: +1.0}, {G.edgeID: "eb", source: "e", sink: "b", sinkPos: 0.0}]),
+  ("d", [{G.edgeID: "da", source: "d", sink: "a", sourcePos: 0.0, sinkPos: -1.0}, {G.edgeID: "dc", source: "d", sink: "c", sourcePos: 0.0, sinkPos: 0.0}]),
+  ("e", [{G.edgeID: "ea", source: "e", sink: "a", sourcePos: 0.0, sinkPos: +1.0}, {G.edgeID: "eb", source: "e", sink: "b", sourcePos: 0.0, sinkPos: 0.0}]),
 ])
 
 let levelMap: Js.Dict.t<int> = Js.Dict.fromArray([

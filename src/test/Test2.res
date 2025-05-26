@@ -13,14 +13,14 @@ let nodes = [
 ]
   
 let edges = [
-  { edgeID: "ac1", source: "a", sink: "c", sinkPos: -1.0 },
-  { edgeID: "bc1", source: "b", sink: "c", sinkPos: 1.0 },
-  { edgeID: "de1", source: "d", sink: "e", sinkPos: 0.0 },
-  { edgeID: "ef1", source: "e", sink: "f", sinkPos: 0.0 },
-  { edgeID: "ga", source: "g", sink: "a", sinkPos: 0.0 },
-  { edgeID: "gb", source: "g", sink: "b", sinkPos: 0.0 },
-  { edgeID: "hg", source: "h", sink: "g", sinkPos: 0.0 },
-  { edgeID: "hd", source: "h", sink: "d", sinkPos: 0.0 },
+  { edgeID: "ac1", source: "a", sink: "c", sourcePos: 0.0, sinkPos: -1.0 },
+  { edgeID: "bc1", source: "b", sink: "c", sourcePos: 0.0, sinkPos: 1.0 },
+  { edgeID: "de1", source: "d", sink: "e", sourcePos: 0.0, sinkPos: 0.0 },
+  { edgeID: "ef1", source: "e", sink: "f", sourcePos: 0.0, sinkPos: 0.0 },
+  { edgeID: "ga", source: "g", sink: "a", sourcePos: 0.0, sinkPos: 0.0 },
+  { edgeID: "gb", source: "g", sink: "b", sourcePos: 0.0, sinkPos: 0.0 },
+  { edgeID: "hg", source: "h", sink: "g", sourcePos: 0.0, sinkPos: 0.0 },
+  { edgeID: "hd", source: "h", sink: "d", sourcePos: 0.0, sinkPos: 0.0 },
 ]
 
 let layout = LPLayout.doLayout({nodes, edges}, { xSpacing: 0.2, ySpacing: 0.2, orientation: FlowingUp })

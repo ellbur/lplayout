@@ -11,6 +11,7 @@ type edge = {
   edgeID: string,
   source: string,
   sink: string,
+  sourcePos: float,
   sinkPos: float
 }
   

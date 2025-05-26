@@ -9,9 +9,9 @@ let nodes = [
 ]
 
 let edges = [
-  { edgeID: "dc", source: "d", sink: "c", sinkPos:  0.0 },
-  { edgeID: "eb", source: "e", sink: "b", sinkPos:  0.0 },
-  { edgeID: "ed", source: "e", sink: "d", sinkPos:  0.0 },
+  { edgeID: "dc", source: "d", sink: "c", sourcePos: 0.0, sinkPos:  0.0 },
+  { edgeID: "eb", source: "e", sink: "b", sourcePos: 0.0, sinkPos:  0.0 },
+  { edgeID: "ed", source: "e", sink: "d", sourcePos: 0.0, sinkPos:  0.0 },
 ]
 
 let layout = LPLayout.doLayout({nodes, edges}, { xSpacing: 0.2, ySpacing: 0.2, orientation: FlowingUp })

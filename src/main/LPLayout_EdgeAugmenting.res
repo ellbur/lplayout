@@ -11,7 +11,7 @@ let augmentNodesAndEdges = (levelMap: Js.Dict.t<int>, nodes: array<LPLayout_Grap
   let augmentedNodes = Belt.Array.copy(nodes)
   let edgeExtraNodes = Js.Dict.empty()
   let augmentedEdges = edges->Belt.Array.flatMap(edge => {
-    let {edgeID, source, sink, sinkPos} = edge
+    let {edgeID, source, sink, sourcePos, sinkPos} = edge
     let sourceLevel = levelMap->Js.Dict.get(source)->getOrElse(() => Js.Exn.raiseError(`Malformed graph: edge ${edgeID} has ` ++
       `source ${source} not among nodes [${nodes->Belt.Array.joinWith(", ", n => n.id)}]`))
     let sinkLevel = levelMap->Js.Dict.get(sink)->getOrElse(() => Js.Exn.raiseError(`Malformed graph: edge ${edgeID} has ` ++
@@ -48,6 +48,14 @@ let augmentNodesAndEdges = (levelMap: Js.Dict.t<int>, nodes: array<LPLayout_Grap
           LPLayout_Graph.edgeID: `${edgeID}_pos_${i->Belt.Int.toString}`,
           source: involvedNodeIDs[i+1]->Option.getExn,
           sink: involvedNodeIDs[i]->Option.getExn,
+          sourcePos: {
+            if i == sourceLevel - sinkLevel - 1 {
+              sourcePos
+            }
+            else {
+              0.0
+            }
+          },
           sinkPos: {
             if i == 0 {
               sinkPos
