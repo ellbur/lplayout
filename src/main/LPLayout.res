@@ -80,12 +80,17 @@ let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions)
         let node1 = nodeIDs[i]->Option.getExn
         let node2 = nodeIDs[i+1]->Option.getExn
         
-        let {width: widthN1} = idMap->Belt.Map.getExn(node1)
-        let {width: widthN2} = idMap->Belt.Map.getExn(node2)
+        let {width: widthN1, centerX: centerXN1} = idMap->Belt.Map.getExn(node1)
+        let {centerX: centerXN2} = idMap->Belt.Map.getExn(node2)
+
         let width1 = widthN1 /. averageWidth
-        let width2 = widthN2 /. averageWidth
+        let centerX1 = centerXN1 /. averageWidth
+
+        let centerX2 = centerXN2 /. averageWidth
         
-        let separation = 0.5 *. (width1 +. width2) +. horizontalSpacing
+        let spacingOnLeft = width1 -. centerX1
+        let spacingOnRight = centerX2
+        let separation = spacingOnLeft +. spacingOnRight +. horizontalSpacing
         
         variables->set(overlapVar(node1, node2), {"badness": overlapBadness})
         constraints->set(indexVar(overlapVar(node1, node2)), {"min": separation})

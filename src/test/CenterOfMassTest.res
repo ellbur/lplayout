@@ -83,8 +83,8 @@ let graph: SVGGraph.graph = {
   nodes: [
     { id: "a", text: "a", nodeAnnotations: { }, nodeMetrics },
     { id: "b", text: "b", nodeAnnotations: { }, nodeMetrics },
-    { id: "c", text: "c", nodeAnnotations: { upperRight: "ccccc" }, nodeMetrics },
-    { id: "d", text: "d", nodeAnnotations: { }, nodeMetrics },
+    { id: "c", text: "c", nodeAnnotations: { upperRight: "ccccccccc" }, nodeMetrics },
+    { id: "d", text: "d", nodeAnnotations: { upperRight: "ddddddddd" }, nodeMetrics },
     { id: "e", text: "e", nodeAnnotations: { }, nodeMetrics },
   ],
   edges: [
@@ -315,8 +315,8 @@ let renderGraph = (~document: Document.t, ~svg: Element.t, ~graph: SVGGraph.grap
   
   {
     let {SVGGraph.nodes: nodes} = graph
-    nodes->Belt.Array.forEach(({id, nodeMetrics, text: nodeText}) => {
-      let {nodeHorizontalPadding, nodeVerticalPadding} = nodeMetrics
+    nodes->Belt.Array.forEach(({id, nodeMetrics, text: nodeText, nodeAnnotations: annotations}) => {
+      let {nodeHorizontalPadding, nodeVerticalPadding, nodeSideTextFontSize, nodeSideTextFontFamily} = nodeMetrics
       let rectElem = document->rect(
         ~rx=nodeMetrics.nodeRoundingX->Belt.Float.toString,
         ~ry=nodeMetrics.nodeRoundingY->Belt.Float.toString,
@@ -340,7 +340,16 @@ let renderGraph = (~document: Document.t, ~svg: Element.t, ~graph: SVGGraph.grap
       let lowerLeftElem: option<Element.t> = None
       let upperLeftElem: option<Element.t> = None
       let lowerRightElem: option<Element.t> = None
-      let upperRightElem: option<Element.t> = None
+
+      let upperRightElem: option<Element.t> = annotations.upperRight->Belt.Option.map(textContent => document->text(
+        ~textAnchor="start",
+        ~dominantBaseline="hanging",
+        ~fontSize=nodeSideTextFontSize,
+        ~fontFamily=nodeSideTextFontFamily,
+        ~class="node-annotation node-annotation-upper-right",
+        ~textContent,
+        ()
+      ))
       
       let nodeChildren = [Some(rectElem), Some(textElem), lowerLeftElem, upperLeftElem, lowerRightElem, upperRightElem]->Belt.Array.flatMap(el =>
         el->Belt.Option.mapWithDefault([], x => [x])
@@ -444,14 +453,14 @@ let renderGraph = (~document: Document.t, ~svg: Element.t, ~graph: SVGGraph.grap
       let {id} = node
       
       let nodeRendering = nodeRenderings->Js.Dict.unsafeGet(id)
-      let {nodeBoxWidth, nodeBoxHeight, nodeMarginLeft, nodeMarginRight, nodeMarginTop, nodeMarginBottom} = nodeRendering
+      let {nodeBoxWidth, nodeBoxHeight, nodeMarginLeft, nodeMarginRight, nodeMarginTop, nodeMarginBottom, nodeRelativeCX, nodeRelativeCY} = nodeRendering
       
       ({
         id: id,
         width: nodeBoxWidth +. nodeMarginLeft +. nodeMarginRight,
         height: nodeBoxHeight +. nodeMarginTop +. nodeMarginBottom,
-        centerX: 0.0,
-        centerY: 0.0
+        centerX: nodeRelativeCX,
+        centerY: nodeRelativeCY
       }: T.node)
     }),
     
