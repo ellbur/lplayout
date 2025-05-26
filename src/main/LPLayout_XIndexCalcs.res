@@ -2,13 +2,32 @@
 module Graph = LPLayout_Graph
 let {doDFSCalc} = module(LPLayout_GraphUtils)
 
+let arrayMedianWithDefault = (ar, d) => {
+  let len = ar->Array.length
+  let half = (len-1)/2
+  if len == 0 {
+    d
+  }
+  else if len == 1 {
+    ar[0]->Option.getExn
+  }
+  else if mod(len, 2) == 0 {
+    0.5*.((ar[half]->Option.getExn) +. (ar[half+1]->Option.getExn))
+  }
+  else {
+    ar[half]->Option.getExn
+  }
+}
+
+let maxInt = (a: int, b: int): int => if a < b { b } else { a }
+
 let buildXIndexMapV2 = (sourceMap: Js.Dict.t<array<Graph.edge>>, levelMap) => {
-  let maxLevel = levelMap->Js.Dict.values->Js.Array2.reduce(Js.Math.max_int, 0)
+  let maxLevel = levelMap->Js.Dict.values->Array.reduce(0, maxInt)
   let numLevels = maxLevel + 1
   let levelGroupings: array<array<string>> = Belt.Array.makeBy(numLevels, _ => [ ])
   levelMap->Js.Dict.entries->Belt.Array.forEach(((nodeID, level)) => {
     let levelArray = levelGroupings[level]->Option.getExn
-    levelArray->Js.Array2.push(nodeID)->ignore
+    levelArray->Array.push(nodeID)
   })
   
   let rec step = i => {
@@ -22,9 +41,9 @@ let buildXIndexMapV2 = (sourceMap: Js.Dict.t<array<Graph.edge>>, levelMap) => {
       })
       
       let currentRowScoreMap = Js.Dict.empty()
-      currentRow->Js.Array2.forEach(node => {
+      currentRow->Array.forEach(node => {
         let individualScores = [ ]
-        sourceMap->Js.Dict.unsafeGet(node)->Js.Array2.forEach(edge => {
+        sourceMap->Dict.get(node)->Option.getExn->Array.forEach(edge => {
           let {sink, sinkPos} = edge
           switch prevRowIndexMap->Js.Dict.get(sink) {
             | None => {
@@ -38,29 +57,14 @@ let buildXIndexMapV2 = (sourceMap: Js.Dict.t<array<Graph.edge>>, levelMap) => {
             }
           }
         })
-        individualScores->Js.Array2.sortInPlaceWith((a, b) => Pervasives.compare(a, b))->ignore
-        let numScores = individualScores->Js.Array2.length
-        let median = {
-          let half = (numScores-1)/2
-          if numScores == 0 {
-            0.0
-          }
-          else if numScores == 1 {
-            individualScores[0]->Option.getExn
-          }
-          else if mod(numScores, 2) == 0 {
-            0.5*.((individualScores[half]->Option.getExn) +. (individualScores[half+1]->Option.getExn))
-          }
-          else {
-            individualScores[half]->Option.getExn
-          }
-        }
+        individualScores->Array.sort((a, b) => Pervasives.compare(a, b)->Ordering.fromInt)
+        let median = arrayMedianWithDefault(individualScores, 0.0)
         currentRowScoreMap->Js.Dict.set(node, median)
       })
       
-      currentRow->Js.Array2.sortInPlaceWith((node1, node2) => {
-        Pervasives.compare(currentRowScoreMap->Js.Dict.get(node1), currentRowScoreMap->Js.Dict.get(node2))
-      })->ignore
+      currentRow->Array.sort((node1, node2) => {
+        Pervasives.compare(currentRowScoreMap->Js.Dict.get(node1), currentRowScoreMap->Js.Dict.get(node2))->Ordering.fromInt
+      })
       
       step(i + 1)
     }
