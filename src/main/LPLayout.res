@@ -44,7 +44,7 @@ let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions)
   
   let siftedLevelGroupings = LPLayout_XIndexCalcs.buildXIndexMapV2(augmentedSourceMap, levelMap)
   
-  let idMap = augmentedNodes->Js.Array2.map(node => {let {id} = node; (id, node)})
+  let augmentedNodeMap = augmentedNodes->Js.Array2.map(node => {let {id} = node; (id, node)})
     ->Belt.Map.fromArray(~id=module(StringComp))
     
   open LPLayout_LP
@@ -80,8 +80,8 @@ let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions)
         let node1 = nodeIDs[i]->Option.getExn
         let node2 = nodeIDs[i+1]->Option.getExn
         
-        let {width: widthN1, centerX: centerXN1} = idMap->Belt.Map.getExn(node1)
-        let {centerX: centerXN2} = idMap->Belt.Map.getExn(node2)
+        let {width: widthN1, centerX: centerXN1} = augmentedNodeMap->Belt.Map.getExn(node1)
+        let {centerX: centerXN2} = augmentedNodeMap->Belt.Map.getExn(node2)
 
         let width1 = widthN1 /. averageWidth
         let centerX1 = centerXN1 /. averageWidth
@@ -142,10 +142,14 @@ let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions)
   
   let sol = solve(model)
   
-  let levelHeights = siftedLevelGroupings->Js.Array2.map(group =>
-    group->Js.Array2.map(id => idMap->Belt.Map.getExn(id))
-      ->Js.Array2.map(({height}) => height)
-      ->Belt.Array.reduce(0.0, Js.Math.max_float)
+  let levelHeights = siftedLevelGroupings->Js.Array2.map(group => {
+      let nodesInGroup = group->Js.Array2.map(id => augmentedNodeMap->Belt.Map.getExn(id))
+      
+      let maxAscent = nodesInGroup->Js.Array2.map(({centerY}) => centerY)->Belt.Array.reduce(0.0, Js.Math.max_float)
+      let maxDescent = nodesInGroup->Js.Array2.map(({height, centerY}) => height -. centerY)->Belt.Array.reduce(0.0, Js.Math.max_float)
+
+      Js.Math.max_float(maxAscent, maxDescent)
+    }
   )
 
   let accumHeights = Belt.Array.make((levelHeights->Belt.Array.length) + 1, 0.0)
@@ -180,9 +184,9 @@ let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions)
     )
   )
     
-  let overhangs = augmentedNodes->Js.Array2.map(({id, width}) => {
+  let overhangs = augmentedNodes->Js.Array2.map(({id, centerX}) => {
     let cx = nodeCenterXs->Js.Dict.unsafeGet(id)
-    let overhang = (width/.2.0) +. (horizontalSpacing*.averageWidth/.2.0) +. cx
+    let overhang = centerX +. (horizontalSpacing*.averageWidth/.2.0) -. cx
     overhang
   })
   let worstOverhang = overhangs->Belt.Array.reduce(0.0, Js.Math.max_float)
