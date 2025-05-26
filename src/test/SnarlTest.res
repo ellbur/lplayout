@@ -401,14 +401,14 @@ let renderGraph = (~document: Document.t, ~svg: Element.t, ~graph: SVGGraph.grap
       let {id} = node
       
       let nodeRendering = nodeRenderings->Js.Dict.unsafeGet(id)
-      let {nodeBoxWidth, nodeBoxHeight, nodeMarginLeft, nodeMarginRight, nodeMarginTop, nodeMarginBottom} = nodeRendering
+      let {nodeBoxWidth, nodeBoxHeight, nodeMarginLeft, nodeMarginRight, nodeMarginTop, nodeMarginBottom, nodeRelativeCX, nodeRelativeCY} = nodeRendering
       
       ({
         id: id,
         width: nodeBoxWidth +. nodeMarginLeft +. nodeMarginRight,
         height: nodeBoxHeight +. nodeMarginTop +. nodeMarginBottom,
-        centerX: 0.0,
-        centerY: 0.0
+        centerX: nodeRelativeCX,
+        centerY: nodeRelativeCY
       }: T.node)
     }),
     
