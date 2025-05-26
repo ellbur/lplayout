@@ -23,10 +23,8 @@ let augmentNodesAndEdges = (levelMap: Js.Dict.t<int>, nodes: array<LPLayout_Grap
           LPLayout_Graph.id: edgeID ++ `_synth_node_${i->Belt.Int.toString}`,
           width: 0.0,
           height: 0.0,
-          marginLeft: 0.0,
-          marginBottom: 0.0,
-          marginTop: 0.0,
-          marginRight: 0.0
+          centerX: 0.0,
+          centerY: 0.0
         }
       })
     

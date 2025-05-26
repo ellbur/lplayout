@@ -405,12 +405,10 @@ let renderGraph = (~document: Document.t, ~svg: Element.t, ~graph: SVGGraph.grap
       
       ({
         id: id,
-        width: nodeBoxWidth,
-        height: nodeBoxHeight,
-        marginLeft: nodeMarginLeft,
-        marginRight: nodeMarginRight,
-        marginTop: nodeMarginTop,
-        marginBottom: nodeMarginBottom,
+        width: nodeBoxWidth +. nodeMarginLeft +. nodeMarginRight,
+        height: nodeBoxHeight +. nodeMarginTop +. nodeMarginBottom,
+        centerX: 0.0,
+        centerY: 0.0
       }: T.node)
     }),
     

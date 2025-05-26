@@ -2,10 +2,10 @@
 open LPLayout.Graph
 
 let nodes = [
-  { id: "b", width: 1.0, height: 1.0, marginTop: 0.0, marginLeft: 0.0, marginBottom: 0.0, marginRight: 0.0  },
-  { id: "c", width: 1.0, height: 1.0, marginTop: 0.0, marginLeft: 0.0, marginBottom: 0.0, marginRight: 0.0  },
-  { id: "d", width: 1.0, height: 1.0, marginTop: 0.0, marginLeft: 0.0, marginBottom: 0.0, marginRight: 0.0  },
-  { id: "e", width: 1.0, height: 1.0, marginTop: 0.0, marginLeft: 0.0, marginBottom: 0.0, marginRight: 0.0  },
+  { id: "b", width: 1.0, height: 1.0, centerX: 0.0, centerY: 0.0 },
+  { id: "c", width: 1.0, height: 1.0, centerX: 0.0, centerY: 0.0 },
+  { id: "d", width: 1.0, height: 1.0, centerX: 0.0, centerY: 0.0 },
+  { id: "e", width: 1.0, height: 1.0, centerX: 0.0, centerY: 0.0 },
 ]
 
 let edges = [

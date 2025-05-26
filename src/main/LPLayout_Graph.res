@@ -3,10 +3,8 @@ type node = {
   id: string,
   width: float,
   height: float,
-  marginLeft: float,
-  marginRight: float,
-  marginTop: float,
-  marginBottom: float,
+  centerX: float,
+  centerY: float,
 }
 
 type edge = {

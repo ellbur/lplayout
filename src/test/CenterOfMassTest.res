@@ -83,7 +83,7 @@ let graph: SVGGraph.graph = {
   nodes: [
     { id: "a", text: "a", nodeAnnotations: { }, nodeMetrics },
     { id: "b", text: "b", nodeAnnotations: { }, nodeMetrics },
-    { id: "c", text: "c", nodeAnnotations: { }, nodeMetrics },
+    { id: "c", text: "c", nodeAnnotations: { upperRight: "ccccc" }, nodeMetrics },
     { id: "d", text: "d", nodeAnnotations: { }, nodeMetrics },
     { id: "e", text: "e", nodeAnnotations: { }, nodeMetrics },
   ],

@@ -80,14 +80,12 @@ let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions)
         let node1 = nodeIDs[i]->Option.getExn
         let node2 = nodeIDs[i+1]->Option.getExn
         
-        let {width: widthN1, marginRight: marginRightN1} = idMap->Belt.Map.getExn(node1)
-        let {width: widthN2, marginLeft: marginLeftN2} = idMap->Belt.Map.getExn(node2)
+        let {width: widthN1} = idMap->Belt.Map.getExn(node1)
+        let {width: widthN2} = idMap->Belt.Map.getExn(node2)
         let width1 = widthN1 /. averageWidth
-        let marginRight1 = marginRightN1 /. averageWidth
         let width2 = widthN2 /. averageWidth
-        let marginLeft2 = marginLeftN2 /. averageWidth
         
-        let separation = 0.5 *. (width1 +. width2) +. horizontalSpacing +. marginRight1 +. marginLeft2
+        let separation = 0.5 *. (width1 +. width2) +. horizontalSpacing
         
         variables->set(overlapVar(node1, node2), {"badness": overlapBadness})
         constraints->set(indexVar(overlapVar(node1, node2)), {"min": separation})
@@ -141,7 +139,7 @@ let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions)
   
   let levelHeights = siftedLevelGroupings->Js.Array2.map(group =>
     group->Js.Array2.map(id => idMap->Belt.Map.getExn(id))
-      ->Js.Array2.map(({height, marginTop, marginBottom}) => height +. marginTop +. marginBottom)
+      ->Js.Array2.map(({height}) => height)
       ->Belt.Array.reduce(0.0, Js.Math.max_float)
   )
 
@@ -160,11 +158,8 @@ let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions)
   
   let nodeCenterYs = Js.Dict.empty()
   levelMap->Js.Dict.entries->Belt.Array.forEach(((nodeID, level)) => {
-    let {marginTop, marginBottom} = idMap->Belt.Map.getExn(nodeID)
     let h1 = accumHeights[level]->Option.getExn
     let h2 = accumHeights[level + 1]->Option.getExn
-    let h1 = h1 +. marginTop
-    let h2 = h2 -. marginBottom
     let midHeight = 0.5 *. (h1 +. h2)
     let centerY = switch layoutOptions.orientation {
       | FlowingUp => midHeight
@@ -180,9 +175,9 @@ let doLayout: (graph, layoutOptions) => layout = ({nodes, edges}, layoutOptions)
     )
   )
     
-  let overhangs = augmentedNodes->Js.Array2.map(({id, width, marginLeft}) => {
+  let overhangs = augmentedNodes->Js.Array2.map(({id, width}) => {
     let cx = nodeCenterXs->Js.Dict.unsafeGet(id)
-    let overhang = (width/.2.0) +. (horizontalSpacing*.averageWidth/.2.0) +. marginLeft -. cx
+    let overhang = (width/.2.0) +. (horizontalSpacing*.averageWidth/.2.0) +. cx
     overhang
   })
   let worstOverhang = overhangs->Belt.Array.reduce(0.0, Js.Math.max_float)
