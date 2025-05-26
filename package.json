@@ -1,6 +1,6 @@
 {
   "name": "@ellbur/lplayout",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "decription": "Simple DAG layout",
   "author": "Owen Healy <owen@owenehealy.com>",
   "license": "WTFPL (http://www.wtfpl.net)",
