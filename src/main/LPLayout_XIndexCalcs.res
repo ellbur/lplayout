@@ -1,69 +1,7 @@
 
 module Graph = LPLayout_Graph
 let {doDFSCalc} = module(LPLayout_GraphUtils)
-
-type median<'t> =
-    Empty
-  | Odd('t)
-  | Even('t, 't)
-
-let medianCompare = (type t, elemCompare: (t, t) => Ordering.t) => (a: median<t>, b: median<t>) => {
-  switch (a, b) {
-    | (Empty, Empty) => Ordering.equal
-    | (Empty, _) => Ordering.less
-    | (_, Empty) =>  Ordering.greater
-    | (Odd(a), Odd(b)) => elemCompare(a, b)
-    | (Odd(a), Even(b, c)) =>
-        let ab = elemCompare(a, b)
-        if Ordering.isLess(ab) {
-          Ordering.less
-        }
-        else {
-          let ac = elemCompare(a, c)
-          if Ordering.isGreater(ac) {
-            Ordering.greater
-          }
-          else {
-            // Technically, undecidable, but we have to pick one
-            Ordering.equal
-          }
-        }
-    | (Even(a, b), Odd(c)) =>
-        let ac = elemCompare(a, c)
-        if Ordering.isGreater(ac) {
-          Ordering.greater
-        }
-        else {
-          let bc = elemCompare(b, c)
-          if Ordering.isLess(bc) {
-            Ordering.less
-          }
-          else {
-            // Technically, undecidable, but we have to pick one
-            Ordering.equal
-          }
-        }
-    | (Even(a, b), Even(c, d)) =>
-        Exn.raiseError("Not implemented")
-  }
-}
-
-let arrayMedian = (type t, ar: array<t>): median<t> => {
-  let len = ar->Array.length
-  let half = (len-1)/2
-  if len == 0 {
-    Empty
-  }
-  else if len == 1 {
-    Odd(ar[0]->Option.getExn)
-  }
-  else if mod(len, 2) == 0 {
-    Even(ar[half]->Option.getExn, ar[half+1]->Option.getExn)
-  }
-  else {
-    Odd(ar[half]->Option.getExn)
-  }
-}
+let {arrayMedian, medianCompare} = module(LPLayout_Median)
 
 let maxInt = (a: int, b: int): int => if a < b { b } else { a }
 
