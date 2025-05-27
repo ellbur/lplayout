@@ -76,6 +76,13 @@ let medianCompare = (type t, elemCompare: (t, t) => Ordering.t) => (a: median<t>
   }
 }
 
+let optionMedianCompare = (type t, elemCompare: (t, t) => Ordering.t) => (a: option<median<t>>, b: option<median<t>>) => switch (a, b) {
+  | (None, None) => Ordering.equal
+  | (None, _) => Ordering.less
+  | (_, None) => Ordering.greater
+  | (Some(a), Some(b)) => medianCompare(elemCompare)(a, b)
+}
+
 let arrayMedian = (type t, ar: array<t>): median<t> => {
   let len = ar->Array.length
   let half = (len-1)/2

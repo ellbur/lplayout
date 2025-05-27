@@ -1,7 +1,7 @@
 
 module Graph = LPLayout_Graph
 let {doDFSCalc} = module(LPLayout_GraphUtils)
-let {arrayMedian, medianCompare} = module(LPLayout_Median)
+let {arrayMedian, optionMedianCompare} = module(LPLayout_Median)
 
 let maxInt = (a: int, b: int): int => if a < b { b } else { a }
 
@@ -66,13 +66,13 @@ let buildXIndexMapV2 = (sourceMap: Js.Dict.t<array<Graph.edge>>, levelMap) => {
             }
           }
         })
-        individualScores->Array.sort((a, b) => Pervasives.compare(a, b)->Ordering.fromInt)
+        individualScores->Array.sort(scoreOrdering)
         let median = arrayMedian(individualScores)
         currentRowScoreMap->Js.Dict.set(node, median)
       })
       
       currentRow->Array.sort((node1, node2) => {
-        Pervasives.compare(currentRowScoreMap->Js.Dict.get(node1), currentRowScoreMap->Js.Dict.get(node2))->Ordering.fromInt
+        optionMedianCompare(scoreOrdering)(currentRowScoreMap->Js.Dict.get(node1), currentRowScoreMap->Js.Dict.get(node2))
       })
       
       step(i + 1)
